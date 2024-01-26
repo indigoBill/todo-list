@@ -1,0 +1,37 @@
+html {
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+:root {
+    --main-color: rgb(143, 177, 143);
+    --sub-color: rgb(247, 242, 233);
+}
+
+body {
+    height: 100vh;
+    margin: 0;
+}
+
+header {
+    background-color: var(--main-color);
+    height: 15%;
+}
+
+.main-section {
+    display: flex;
+    height: 85%;
+}
+
+.side-bar {
+    width: 20%;
+    background-color: var(--sub-color);
+}
+
+.content {
+    width: 80%;
+    background-color: white;
+}
