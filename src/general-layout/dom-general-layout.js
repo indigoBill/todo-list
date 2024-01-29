@@ -6,19 +6,58 @@ export const GENERAL_LAYOUT = 'load general layout';
 const body = document.querySelector('body');
 
 const header = (function(){
-    function createHeader(){
-        const headerElement = document.createElement('header');
-        headerElement.classList.add('header');
+    function createHeaderTitle(){
+        const headerTitleContainer = document.createElement('div');
+        const headerTitle = document.createElement('div');
 
-        body.appendChild(headerElement);
+        headerTitleContainer.classList.add('header-title-container');
+        headerTitle.classList.add('header-title');
+
+        headerTitle.textContent = 'Todo List';
+
+        headerTitleContainer.appendChild(headerTitle);
+
+        return headerTitleContainer;
     }
 
-    return { createHeader };
+    function createIconButton(iconClass){
+        const iconBtnContainer = document.createElement('div');
+        const iconBtn = document.createElement('button');
+
+        iconBtn.classList.add('icon-btn');
+        iconBtn.classList.add(iconClass);
+        
+        iconBtnContainer.appendChild(iconBtn);
+
+        return iconBtnContainer;
+    }
+    
+    function createHeaderSection(){
+        const headerElement = document.createElement('header');
+        const headerContentContainer = document.createElement('div');
+        const headerLeftSection = document.createElement('div');
+        const headerRightSection = document.createElement('div');
+
+        headerElement.classList.add('header');
+        headerContentContainer.classList.add('header-content-container');
+        headerLeftSection.classList.add('header-left-section');
+        headerRightSection.classList.add('header-right-section');
+
+        body.appendChild(headerElement);
+        headerElement.appendChild(headerContentContainer);
+        headerContentContainer.appendChild(headerLeftSection);
+        headerContentContainer.appendChild(headerRightSection);
+
+        headerLeftSection.appendChild(createHeaderTitle());
+        headerLeftSection.appendChild(createIconButton('menu-btn'));
+    }
+
+    return { createHeaderSection };
 })();
 
 const main = (function(){
     function addChildrenToMainSection(domElement){
-        const sideBar = document.createElement('div');
+        const sideBar = document.createElement('nav');
         const content = document.createElement('div');
 
         sideBar.classList.add('side-bar');
@@ -142,7 +181,7 @@ const sideBar = (function(){
 
 
 function createGeneralLayout(){
-    header.createHeader();
+    header.createHeaderSection();
     main.createMainSection();
     sideBar.createSideBarSection();
 }
