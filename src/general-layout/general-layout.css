@@ -20,12 +20,44 @@ body {
 
 header {
     background-color: var(--main-color);
-    height: 15%;
+    height: 10%;
+    display: flex;
+    align-items: center;
 }
+
+.header-content-container {
+    padding: 10px;
+    width: 100%;
+}
+
+.header-left-section {
+    width: fit-content;
+}
+
+.header-title-container {
+    width: fit-content;
+}
+
+.header-title {
+    font-size: 40px;
+    font-weight: bold;
+    color: white;
+}
+
+.icon-btn {
+    border: none;
+}
+
+.menu-btn {
+    background: url('./assets/menu.svg');
+    background-size: contain;
+    background-position: top;
+}
+
 
 .main-section {
     display: flex;
-    height: 85%;
+    height: 90%;
 }
 
 .side-bar {
@@ -80,11 +112,26 @@ USE JS TO MAKE CIRCLE APPEAR WHEN THERE ARE TASKS THAT FIT THE CATEGORY*/
     border-radius: 50%;
 }
 
-/*CREATE BACKGROUND SLIDING ANIMATION BEHIND OPTION WHEN CURSOR HOVERS OVER OPTION*/
-.filter-option:hover {
-    cursor: pointer;
-    background-color: white;
+/*CHECK IF THIS WORKS ON OLDER BROWSERS SINCE INITIAL-VALUE IS STILL EXPERIMENTAL*/
+@property --color-start {
+    syntax: "<percentage>";
+    inherits: false;
+    initial-value: 0%;
 }
+.filter-option,
+.projects-list > div,
+.add-project-btn {
+    transition: --color-start 1s;
+    background:linear-gradient(to right, white var(--color-start),var(--sub-color) 0);
+}
+
+.filter-option:hover,
+.projects-list > div:hover,
+.add-project-btn:hover {
+    cursor: pointer;
+    --color-start: 100%;
+}
+/**/
 
 .projects-container {
     display: flex;
@@ -101,16 +148,8 @@ USE JS TO MAKE CIRCLE APPEAR WHEN THERE ARE TASKS THAT FIT THE CATEGORY*/
     font-size: 18px;
 }
 
-.projects-list {
-    gap: 20px;
-}
-
-.projects-list > div:hover {
-    cursor: pointer;
-}
-
-.project-btn-container {
-   
+.projects-list > div {
+    padding: 10px;
 }
 
 .add-project-btn {
@@ -120,11 +159,6 @@ USE JS TO MAKE CIRCLE APPEAR WHEN THERE ARE TASKS THAT FIT THE CATEGORY*/
     font-size: 14px;
     color: var(--dark-main-color);
     font-weight: bold;
-}
-
-.add-project-btn:hover {
-    background-color: white;
-    cursor: pointer;
 }
 
 .content {
