@@ -1,8 +1,11 @@
 html {
     box-sizing: border-box;
+    height: 100%;
 }
 
-*, *:before, *:after {
+*,
+*:before,
+*:after {
     box-sizing: inherit;
 }
 
@@ -14,28 +17,31 @@ html {
 }
 
 body {
-    height: 100vh;
     margin: 0;
+    height: 100%;
 }
 
 header {
     background-color: var(--main-color);
-    height: 10%;
+    min-height: 10%;
     display: flex;
-    align-items: center;
 }
 
 .header-content-container {
-    padding: 10px;
     width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
-.header-left-section {
-    width: fit-content;
+.header-top-section {
+    display: flex;
+    background-color: var(--dark-main-color);
+    justify-content: space-between;
 }
 
 .header-title-container {
     width: fit-content;
+    padding: 5px 10px;
 }
 
 .header-title {
@@ -44,20 +50,87 @@ header {
     color: white;
 }
 
-.icon-btn {
-    border: none;
+.input-container {
+    display: flex;
+    align-items: center;
+    padding-right: 10px;
+}
+
+input {
+    border-radius: 10px;
+    border: 3px solid var(--main-color);
+    min-height: 30px;
+    text-indent: 5px;
+}
+
+input:focus {
+    outline: 2px solid var(--sub-color);
 }
 
 .menu-btn {
     background: url('./assets/menu.svg');
-    background-size: contain;
-    background-position: top;
 }
 
+.home-btn {
+    background: url('./assets/home-variant.svg');
+}
+
+.add-btn {
+    background: url('./assets/plus.svg');
+}
+
+.search-btn {
+    background: url('./assets/magnify.svg');
+}
+
+.menu-btn:hover,
+.home-btn:hover,
+.add-btn:hover,
+.search-btn:hover {
+    cursor: pointer;
+}
+
+.icon-btn-container {
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+}
+
+.icon-btn {
+    border: none;
+    padding: 0;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 30px;
+    height: 30px;
+    filter: invert(100%) sepia(0%) saturate(7484%) hue-rotate(94deg) brightness(98%) contrast(103%);
+}
+
+.header-bottom-section > div:last-child {
+    margin-left: auto;
+}
+
+.header-bottom-section {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 5px 0;
+}
+
+.visually-hidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
 
 .main-section {
     display: flex;
-    height: 90%;
+    min-height: 100%;
 }
 
 .side-bar {
@@ -70,7 +143,7 @@ header {
     display: flex;
     flex-direction: column;
     gap: 50px;
-    padding: 100px 0 20px 0;
+    padding: 50px 0 20px 0;
     color: var(--dark-main-color);
 }
 
@@ -99,7 +172,7 @@ header {
     padding: 10px;
 }
 
-.filter-option > div:first-child {
+.filter-option>div:first-child {
     width: 100px;
 }
 
@@ -118,19 +191,21 @@ USE JS TO MAKE CIRCLE APPEAR WHEN THERE ARE TASKS THAT FIT THE CATEGORY*/
     inherits: false;
     initial-value: 0%;
 }
+
 .filter-option,
-.projects-list > div,
+.projects-list>div,
 .add-project-btn {
     transition: --color-start 1s;
-    background:linear-gradient(to right, white var(--color-start),var(--sub-color) 0);
+    background: linear-gradient(to right, white var(--color-start), var(--sub-color) 0);
 }
 
 .filter-option:hover,
-.projects-list > div:hover,
+.projects-list>div:hover,
 .add-project-btn:hover {
     cursor: pointer;
     --color-start: 100%;
 }
+
 /**/
 
 .projects-container {
@@ -139,7 +214,7 @@ USE JS TO MAKE CIRCLE APPEAR WHEN THERE ARE TASKS THAT FIT THE CATEGORY*/
     gap: 20px;
 }
 
-.projects-container > div {
+.projects-container>div {
     text-align: center;
 }
 
@@ -148,7 +223,7 @@ USE JS TO MAKE CIRCLE APPEAR WHEN THERE ARE TASKS THAT FIT THE CATEGORY*/
     font-size: 18px;
 }
 
-.projects-list > div {
+.projects-list>div {
     padding: 10px;
 }
 
@@ -164,4 +239,10 @@ USE JS TO MAKE CIRCLE APPEAR WHEN THERE ARE TASKS THAT FIT THE CATEGORY*/
 .content {
     width: 80%;
     background-color: white;
+}
+
+@media screen and (max-width: 500px) {
+    .input-container {
+        display: none;
+    }
 }
