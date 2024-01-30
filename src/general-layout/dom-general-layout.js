@@ -24,32 +24,56 @@ const header = (function(){
         const iconBtnContainer = document.createElement('div');
         const iconBtn = document.createElement('button');
 
+        iconBtnContainer.classList.add('icon-btn-container');
         iconBtn.classList.add('icon-btn');
         iconBtn.classList.add(iconClass);
-        
+
         iconBtnContainer.appendChild(iconBtn);
 
         return iconBtnContainer;
+    }
+
+    function createSearchInput(){
+        const inputContainer = document.createElement('div');
+        const label = document.createElement('label');
+        const input = document.createElement('input');
+
+        label.setAttribute('for', 'search');
+        input.setAttribute('type', 'text');
+        input.setAttribute('name', 'search');
+        input.setAttribute('id', 'search');
+
+        inputContainer.classList.add('input-container');
+        label.classList.add('visually-hidden');
+
+        inputContainer.appendChild(createIconButton('search-btn'));
+        inputContainer.appendChild(label);
+        inputContainer.appendChild(input);
+
+        return inputContainer;
     }
     
     function createHeaderSection(){
         const headerElement = document.createElement('header');
         const headerContentContainer = document.createElement('div');
-        const headerLeftSection = document.createElement('div');
-        const headerRightSection = document.createElement('div');
+        const headerTopSection = document.createElement('div');
+        const headerBottomSection = document.createElement('div');
 
         headerElement.classList.add('header');
         headerContentContainer.classList.add('header-content-container');
-        headerLeftSection.classList.add('header-left-section');
-        headerRightSection.classList.add('header-right-section');
+        headerTopSection.classList.add('header-top-section');
+        headerBottomSection.classList.add('header-bottom-section');
 
         body.appendChild(headerElement);
         headerElement.appendChild(headerContentContainer);
-        headerContentContainer.appendChild(headerLeftSection);
-        headerContentContainer.appendChild(headerRightSection);
+        headerContentContainer.appendChild(headerTopSection);
+        headerContentContainer.appendChild(headerBottomSection);
 
-        headerLeftSection.appendChild(createHeaderTitle());
-        headerLeftSection.appendChild(createIconButton('menu-btn'));
+        headerTopSection.appendChild(createHeaderTitle());
+        headerTopSection.appendChild(createSearchInput());
+        headerBottomSection.appendChild(createIconButton('menu-btn'));
+        headerBottomSection.appendChild(createIconButton('home-btn'));
+        headerBottomSection.appendChild(createIconButton('add-btn'));
     }
 
     return { createHeaderSection };
