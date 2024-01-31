@@ -1,3 +1,4 @@
+import { EVENT_LISTENERS, LISTENER } from '../barrel.js';
 import './general-layout.css';
 import PubSub from 'pubsub-js';
 
@@ -198,16 +199,34 @@ const sideBar = (function(){
         sideBarContentContainer.appendChild(createProjects());
         sideBarContentContainer.appendChild(createSideBarDivider());
         sideBarContentContainer.appendChild(createAddProjectBtn());
+
     }
 
-    return { createSideBarSection };
+    function toggleSideBarDisplay(){
+        const sideBar = document.querySelector('.side-bar');
+
+        sideBar.classList.toggle('slide');
+
+    }
+
+    return { createSideBarSection, toggleSideBarDisplay };
 })();
 
+function createSubscribers(){
+    PubSub.subscribe(LISTENER.sideBar, sideBar.toggleSideBarDisplay);
+}
 
 function createGeneralLayout(){
     header.createHeaderSection();
     main.createMainSection();
     sideBar.createSideBarSection();
+
+    //CALL FUNCTION HERE TO ADD ALL EVENT LISTENERS
+    PubSub.publish(EVENT_LISTENERS);
+
+    createSubscribers();
 }
 
+
 PubSub.subscribe(GENERAL_LAYOUT, createGeneralLayout);
+
