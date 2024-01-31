@@ -137,6 +137,9 @@ input:focus {
     width: 20%;
     min-width: max-content;
     background-color: var(--sub-color);
+
+    transition: translate 1s;
+    translate: none;
 }
 
 .side-bar-content-container {
@@ -234,6 +237,10 @@ USE JS TO MAKE CIRCLE APPEAR WHEN THERE ARE TASKS THAT FIT THE CATEGORY*/
     font-size: 14px;
     color: var(--dark-main-color);
     font-weight: bold;
+}
+
+.slide {
+    translate: -100%;
 }
 
 .content {
