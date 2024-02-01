@@ -1,0 +1,11 @@
+.main-section {
+    display: grid;
+    grid-template-columns: 20% auto;
+    height: 100%;
+    
+    transition: grid-template-columns 1s;
+}
+
+.main-section-slide {
+    grid-template-columns: 0 auto;
+}

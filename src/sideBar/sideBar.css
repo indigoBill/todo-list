@@ -1,0 +1,101 @@
+.side-bar {
+    background-color: var(--sub-color);
+    min-width: min-content;
+}
+
+.side-bar-content-container {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    padding: 50px 0 20px 0;
+    color: var(--dark-main-color);
+}
+
+.divider-container {
+    display: flex;
+    justify-content: center;
+}
+
+.side-bar-divider {
+    height: 2px;
+    background-color: var(--main-color);
+    border-radius: 10px;
+    min-width: 80%;
+}
+
+.side-bar-filter-options,
+.projects-list {
+    display: flex;
+    flex-direction: column;
+    font-weight: 400;
+}
+
+.filter-option {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 40px;
+}
+
+.filter-option>div:first-child {
+    width: 100px;
+}
+
+/*USE TO DISPLAY NUMBER OF TO-DOs IN EACH CATEGORY
+USE JS TO MAKE CIRCLE APPEAR WHEN THERE ARE TASKS THAT FIT THE CATEGORY*/
+.task-count {
+    width: 20px;
+    height: 20px;
+    background-color: var(--main-color);
+    border-radius: 50%;
+}
+
+/*CHECK IF THIS WORKS ON OLDER BROWSERS SINCE INITIAL-VALUE IS STILL EXPERIMENTAL*/
+@property --color-start {
+    syntax: "<percentage>";
+    inherits: false;
+    initial-value: 0%;
+}
+
+.filter-option,
+.projects-list>div,
+.add-project-btn {
+    transition: --color-start 1s;
+    background: linear-gradient(to right, white var(--color-start), var(--sub-color) 0);
+}
+
+.filter-option:hover,
+.projects-list>div:hover,
+.add-project-btn:hover {
+    cursor: pointer;
+    --color-start: 100%;
+}
+
+/**/
+
+.projects-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.projects-container>div {
+    text-align: center;
+}
+
+.projects-title {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.projects-list>div {
+    padding: 10px;
+}
+
+.add-project-btn {
+    width: 100%;
+    height: 40px;
+    border: none;
+    font-size: 14px;
+    color: var(--dark-main-color);
+    font-weight: bold;
+}
