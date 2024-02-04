@@ -1,5 +1,5 @@
 import PubSub from 'pubsub-js';
-import { GENERAL_LAYOUT, LISTENER } from '../barrel.js';
+import { GENERAL_LAYOUT, SIDEBAR_DISPLAY } from '../barrel.js';
 import './main.css';
 
 const body = document.querySelector('body');
@@ -29,15 +29,21 @@ const main = (function(){
 })();
 
 const mainDynamic = (function(){
-    function toggleSideBarDisplay(){
+    function revealSideBar(){
         const mainSection = document.querySelector('.main-section');
+        const mediaQuery = window.matchMedia('(max-width: 500px)');
 
-        mainSection.classList.toggle('main-section-slide');
+        if(mediaQuery.matches){
+            mainSection.classList.remove('main-section-slide');
+        }else{
+            mainSection.classList.toggle('main-section-slide');
+        }
     }
 
-    return { toggleSideBarDisplay };
+    return { revealSideBar };
 })();
 
 
 PubSub.subscribe(GENERAL_LAYOUT, main.createMainSection);
-PubSub.subscribe(LISTENER.main, mainDynamic.toggleSideBarDisplay);
+PubSub.subscribe(SIDEBAR_DISPLAY, mainDynamic.revealSideBar);
+

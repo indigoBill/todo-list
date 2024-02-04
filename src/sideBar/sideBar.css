@@ -1,6 +1,24 @@
 .side-bar {
     background-color: var(--sub-color);
-    min-width: min-content;
+    min-width: min-content;    
+    translate: 0;
+    transition: 1s;
+}
+
+@media screen and (max-width: 500px) {
+    .side-bar {
+        translate: -100%;
+    }
+}
+
+.side-bar-cover {
+    translate: 0;
+    position: relative;
+}
+
+.side-bar-push {
+    position: static;
+    translate: -100%;
 }
 
 .side-bar-content-container {
@@ -64,7 +82,7 @@ USE JS TO MAKE CIRCLE APPEAR WHEN THERE ARE TASKS THAT FIT THE CATEGORY*/
 }
 
 .filter-option:hover,
-.projects-list>div:hover,
+.projects-list > div:hover,
 .add-project-btn:hover {
     cursor: pointer;
     --color-start: 100%;
@@ -99,3 +117,6 @@ USE JS TO MAKE CIRCLE APPEAR WHEN THERE ARE TASKS THAT FIT THE CATEGORY*/
     color: var(--dark-main-color);
     font-weight: bold;
 }
+
+
+

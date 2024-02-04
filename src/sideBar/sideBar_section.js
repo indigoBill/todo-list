@@ -1,5 +1,5 @@
 import PubSub from 'pubsub-js';
-import { GENERAL_LAYOUT } from '../barrel.js';
+import { GENERAL_LAYOUT, SIDEBAR_DISPLAY } from '../barrel.js';
 import './sideBar.css';
 
 const sideBar = (function(){
@@ -100,10 +100,28 @@ const sideBar = (function(){
 
     }
 
-    
-
     return { createSideBarSection };
 })();
 
 
+const sideBarDynamic = (function(){
+    function revealSideBar(){
+        const sideBar = document.querySelector('.side-bar');
+        const mediaQuery = window.matchMedia('(max-width: 500px)');
+
+        if(mediaQuery.matches){
+            sideBar.classList.toggle('side-bar-cover');
+            sideBar.classList.remove('side-bar-push');
+        }else{
+            sideBar.classList.toggle('side-bar-push');
+            sideBar.classList.remove('side-bar-cover');
+        }
+    }
+
+    return { revealSideBar };
+})();
+
+
 PubSub.subscribe(GENERAL_LAYOUT, sideBar.createSideBarSection);
+PubSub.subscribe(SIDEBAR_DISPLAY, sideBarDynamic.revealSideBar);
+
