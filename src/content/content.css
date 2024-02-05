@@ -13,7 +13,7 @@
     max-width: 70%;
     width: 100%;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: bold;
     background-color: var(--sub-color);
     color: var(--dark-main-color);
@@ -24,20 +24,39 @@
 }
 
 .add-task-btn,
-.task-container {
+.task-adder-container {
     border: 3px solid var(--main-color);
     border-radius: 10px;
 }
 
-.task-container {
+.task-adder-container {
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    margin: 20px 20px 0 20px;
 }
 
-.task-container > div {
+.task-adder-container > div {
     display: flex;
     justify-content: space-between;
     max-width: 50%;
+}
+
+.hide-task-btn {
+    display: none;
+}
+
+.required-container {
+    background-color: var(--main-color);
+    height: 30px;
+    width: 90px;
+    font-size: .9rem;
+    font-weight: bold;
+    border-radius: 5px;
+    color: var(--sub-color);
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
