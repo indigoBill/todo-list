@@ -73,7 +73,7 @@ const header = (function(){
         headerTopSection.appendChild(createSearchInput());
         headerBottomSection.appendChild(createIconButton('menu-btn'));
         headerBottomSection.appendChild(createIconButton('home-btn'));
-        headerBottomSection.appendChild(createIconButton('add-btn'));
+        headerBottomSection.appendChild(createIconButton('plus-btn'));
     }
 
     return { createHeaderSection };

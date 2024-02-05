@@ -25,7 +25,6 @@ header {
     background-color: var(--main-color);
     min-height: 10%;
     display: flex;
-    grid-column: 1/3;
 }
 
 .header-content-container {
@@ -76,7 +75,7 @@ input:focus {
     background: url('./assets/home-variant.svg');
 }
 
-.add-btn {
+.plus-btn {
     background: url('./assets/plus.svg');
 }
 
@@ -132,8 +131,12 @@ input:focus {
     width: 1px;
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 560px) {
     .input-container {
         display: none;
+    }
+
+    .header-top-section {
+        justify-content: center;
     }
 }
