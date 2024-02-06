@@ -107,7 +107,7 @@ const sideBar = (function(){
 const sideBarDynamic = (function(){
     function revealSideBar(){
         const sideBar = document.querySelector('.side-bar');
-        const mediaQuery = window.matchMedia('(max-width: 500px)');
+        const mediaQuery = window.matchMedia('(max-width: 560px)');
 
         if(mediaQuery.matches){
             sideBar.classList.toggle('side-bar-cover');

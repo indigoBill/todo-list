@@ -31,7 +31,7 @@ const main = (function(){
 const mainDynamic = (function(){
     function revealSideBar(){
         const mainSection = document.querySelector('.main-section');
-        const mediaQuery = window.matchMedia('(max-width: 500px)');
+        const mediaQuery = window.matchMedia('(max-width: 560px)');
 
         if(mediaQuery.matches){
             mainSection.classList.remove('main-section-slide');
