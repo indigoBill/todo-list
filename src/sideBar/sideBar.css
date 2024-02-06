@@ -5,7 +5,7 @@
     transition: 1s;
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 560px) {
     .side-bar {
         translate: -100%;
     }

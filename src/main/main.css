@@ -9,7 +9,7 @@
     grid-template-columns: 0 auto;
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 560px) {
     .main-section {
         grid-template-columns: 0 auto;
     }
