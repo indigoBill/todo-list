@@ -2,10 +2,17 @@
     background-color: white;
 }
 
+.content > div {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+}
+
 .add-task-btn-container {
     padding: 20px;
     display: flex;
     justify-content: center;
+    min-width: 70%;
 }
 
 .add-task-btn {
@@ -24,7 +31,9 @@
 }
 
 .add-task-btn,
-.task-adder-container {
+.task-adder-container,
+select,
+.btn-container > button {
     border: 3px solid var(--main-color);
     border-radius: 10px;
 }
@@ -33,18 +42,25 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin: 20px 20px 0 20px;
+    gap: 30px;
+    margin-top: 20px;
+    color: var(--dark-main-color);
+    font-weight: bold;
+    max-width: fit-content;
+    height: fit-content;
 }
 
 .task-adder-container > div {
     display: flex;
-    justify-content: space-between;
-    max-width: 50%;
+    gap: 10px;
+    align-items: center;
 }
 
-.hide {
-    display: none;
+.title-container > input,
+.description-container > input {
+    border-radius: 0;
+    border: 0;
+    border-bottom: 3px solid var(--main-color);
 }
 
 .required-container {
@@ -60,3 +76,53 @@
     justify-content: center;
     align-items: center;
 }
+
+.priority-container,
+.btn-container {
+    justify-content: center;
+}
+
+select,
+.btn-container > button {
+    height: 40px;
+    background-color: var(--sub-color);
+    color: var(--dark-main-color);
+    font-weight: bold;
+    text-align: center;
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+select:focus {
+    outline: none;
+}
+
+.task-container {
+    background-color: var(--sub-color);
+    border-radius: 10px;
+    width: 90%;
+    padding: 5px 20px;
+    color: var(--dark-main-color);
+}
+
+.hide {
+    display: none;
+}
+
+@media screen and (max-width: 420px) {
+    .required-container {
+        display: none;
+    }
+
+    .task-adder-container > div {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .task-adder-container > div:nth-child(-n + 2) > label::before {
+        content: '*';
+    }
+}
+
