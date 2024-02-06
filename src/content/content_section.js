@@ -1,5 +1,6 @@
 import PubSub from 'pubsub-js';
 import { GENERAL_LAYOUT, SHOW_TASK_ADDER, TASK_ADDER_EVENT_LISTENER, CHECK_TASK_INPUTS } from '../barrel.js';
+import { endOfYesterday, format } from 'date-fns';
 import './content.css';
 
 const content = (function(){
@@ -75,12 +76,14 @@ const taskAdder = (function(){
         const datePickerContainer = document.createElement('div');
         const datePickerLabel = document.createElement('label');
         const datePicker = document.createElement('input');
+        const today = format(new Date(), 'yyyy-MM-dd');
 
         datePickerLabel.textContent = 'DUE DATE:';
 
         datePickerLabel.setAttribute('for', 'date');
         datePicker.setAttribute('id', 'date');
         datePicker.setAttribute('type', 'date');
+        datePicker.setAttribute('min', today);
 
         datePicker.required = true;
 
@@ -125,7 +128,7 @@ const taskAdder = (function(){
         highPriority.textContent = 'HIGH';
 
         selectContainer.classList.add('priority-container');
-
+        
         selectContainer.appendChild(select);
         select.appendChild(selectHeader);
         select.appendChild(lowPriority);
@@ -176,7 +179,6 @@ const taskAdder = (function(){
     }
 
     function clearInputs(){
-    
         const title = getInput('title');
         const date = getInput('date');
         const description = getInput('description');
@@ -185,7 +187,11 @@ const taskAdder = (function(){
         const inputs = [title, date, description, priority];
 
         inputs.forEach((input) => {
-            input.value = '';
+            if(input.type.includes('select')){
+                input.selectedIndex = 0; 
+            }else {
+                input.value = '';
+            }
         });
     }
 
@@ -279,6 +285,8 @@ const addedTask = (function(){
         const content = document.querySelector('.content');
 
         const taskContainer = document.createElement('div');
+
+        taskContainer.classList.add('task-container');
         
         taskContainer.appendChild(createTaskTitle());
         taskContainer.appendChild(createTaskDueDate());
@@ -311,6 +319,7 @@ const addedTask = (function(){
 
 PubSub.subscribe(GENERAL_LAYOUT, content.createAddTaskBtn);
 PubSub.subscribe(GENERAL_LAYOUT, taskAdder.openTaskAdder);
+PubSub.subscribe(SHOW_TASK_ADDER, taskAdder.clearInputs);
 PubSub.subscribe(SHOW_TASK_ADDER, taskAdder.toggleTaskAdderDisplay);
 PubSub.subscribe(SHOW_TASK_ADDER, content.toggleAddTaskBtnDisplay);
 PubSub.subscribe(CHECK_TASK_INPUTS, addedTask.checkRequiredInputValues);
