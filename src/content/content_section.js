@@ -1,5 +1,5 @@
 import PubSub from 'pubsub-js';
-import { GENERAL_LAYOUT, CREATE_TASK_ADDER, TASK_ADDER_EVENT_LISTENER, CHECK_TASK_INPUTS } from '../barrel.js';
+import { GENERAL_LAYOUT, SHOW_TASK_ADDER, TASK_ADDER_EVENT_LISTENER, CHECK_TASK_INPUTS } from '../barrel.js';
 import './content.css';
 
 const content = (function(){
@@ -28,7 +28,7 @@ const content = (function(){
     function toggleAddTaskBtnDisplay(){
         const taskBtnContainer = document.querySelector('.add-task-btn-container');
 
-        taskBtnContainer.classList.toggle('hide-task-btn');
+        taskBtnContainer.classList.toggle('hide');
     }
 
 
@@ -154,11 +154,47 @@ const taskAdder = (function(){
         return btnContainer;
     }
 
+    function getInput(inputName){
+        let input;
+
+        switch(inputName) {
+            case 'title' :
+                input = document.querySelector('#title');
+                break;
+            case 'date' :
+                input = document.querySelector('#date');
+                break;
+            case 'description' :
+                input = document.querySelector('#description');
+                break;
+            case 'priority' :
+                input = document.querySelector('select');
+                break;
+        }
+
+        return input;
+    }
+
+    function clearInputs(){
+    
+        const title = getInput('title');
+        const date = getInput('date');
+        const description = getInput('description');
+        const priority = getInput('priority');
+
+        const inputs = [title, date, description, priority];
+
+        inputs.forEach((input) => {
+            input.value = '';
+        });
+    }
+
     function openTaskAdder(){
         const content = document.querySelector('.content');
         const taskContainer = document.createElement('div');
         
         taskContainer.classList.add('task-adder-container');
+        taskContainer.classList.add('hide');
 
         taskContainer.appendChild(createTitleInput());
         taskContainer.appendChild(createDueDateCalendar());
@@ -170,37 +206,19 @@ const taskAdder = (function(){
         PubSub.publish(TASK_ADDER_EVENT_LISTENER);
     }
 
-    return { openTaskAdder };
+    function toggleTaskAdderDisplay(){
+        const taskAdder = document.querySelector('.task-adder-container');
+
+        taskAdder.classList.toggle('hide');
+    }
+
+    return { openTaskAdder, getInput, clearInputs, toggleTaskAdderDisplay };
 })();
 
 const addedTask = (function(){
-
-    function getTaskTitle(){
-        const titleNode = document.querySelector('#title');
-
-        return titleNode;
-    }
-
-    function getTaskDueDate(){
-        const dateNode = document.querySelector('#date');
-
-        return dateNode;
-    }
-
-    function getDescription(){
-        const descriptionNode = document.querySelector('#description');
-
-        return descriptionNode;
-    }
-
-    function getPriority(){
-        const priorityNode = document.querySelector('select');
-
-        return priorityNode;
-    }
-
+   
     function createTaskTitle(){
-        const titleNode = getTaskTitle();
+        const titleNode = taskAdder.getInput('title');
         const taskHeaderContainer = document.createElement('div');
         const taskHeader = document.createElement('h3');
         
@@ -214,7 +232,7 @@ const addedTask = (function(){
     }
 
     function createTaskDueDate(){
-        const dateNode = getTaskDueDate();
+        const dateNode = taskAdder.getInput('date');
         const dateContainer = document.createElement('div');
         const date = document.createElement('p');
 
@@ -228,7 +246,7 @@ const addedTask = (function(){
     }
 
     function createTaskDescription(){
-        const descriptionNode = getDescription();
+        const descriptionNode = taskAdder.getInput('description');
         const descriptionContainer = document.createElement('div');
         const description = document.createElement('p');
 
@@ -243,7 +261,7 @@ const addedTask = (function(){
     }
 
     function createTaskPriority(){
-        const priorityNode = getPriority();
+        const priorityNode = taskAdder.getInput('priority');
         const priorityContainer = document.createElement('div');
         const priority = document.createElement('p');
 
@@ -276,27 +294,15 @@ const addedTask = (function(){
         content.appendChild(taskContainer);
     }
 
-    function clearInputs(){
-        const title = getTaskTitle();
-        const date = getTaskDueDate();
-        const description = getDescription();
-        const priority = getPriority();
-
-        const inputs = [title, date, description, priority];
-
-        inputs.forEach((input) => {
-            input.value = '';
-        });
-    }
-
-
     function checkRequiredInputValues(){
-        const titleNode = getTaskTitle();
-        const dateNode = getTaskDueDate();
+        const titleNode = taskAdder.getInput('title');
+        const dateNode = taskAdder.getInput('date');
 
         if(titleNode.value && dateNode.value){
             createAddedTask();
-            clearInputs();
+            taskAdder.clearInputs();
+            content.toggleAddTaskBtnDisplay();
+            taskAdder.toggleTaskAdderDisplay();
         }
     }
 
@@ -304,6 +310,7 @@ const addedTask = (function(){
 })();
 
 PubSub.subscribe(GENERAL_LAYOUT, content.createAddTaskBtn);
-PubSub.subscribe(CREATE_TASK_ADDER, taskAdder.openTaskAdder);
-PubSub.subscribe(CREATE_TASK_ADDER, content.toggleAddTaskBtnDisplay);
+PubSub.subscribe(GENERAL_LAYOUT, taskAdder.openTaskAdder);
+PubSub.subscribe(SHOW_TASK_ADDER, taskAdder.toggleTaskAdderDisplay);
+PubSub.subscribe(SHOW_TASK_ADDER, content.toggleAddTaskBtnDisplay);
 PubSub.subscribe(CHECK_TASK_INPUTS, addedTask.checkRequiredInputValues);
