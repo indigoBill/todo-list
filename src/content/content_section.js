@@ -1,6 +1,6 @@
 import PubSub from 'pubsub-js';
-import { GENERAL_LAYOUT, SHOW_TASK_ADDER, TASK_ADDER_EVENT_LISTENER, CHECK_TASK_INPUTS } from '../barrel.js';
-import { endOfYesterday, format } from 'date-fns';
+import { GENERAL_LAYOUT, SHOW_TASK_ADDER, TASK_ADDER_EVENT_LISTENER, CHECK_TASK_INPUTS, ADDED_TASK_EVENT_LISTENER, EXTEND_TASK } from '../barrel.js';
+import { format } from 'date-fns';
 import './content.css';
 
 const content = (function(){
@@ -258,6 +258,7 @@ const addedTask = (function(){
 
         if(descriptionNode.value){
             descriptionContainer.classList.add('task-description');
+            descriptionContainer.classList.add('hide');
 
             description.textContent = descriptionNode.value;
             descriptionContainer.appendChild(description);
@@ -273,6 +274,7 @@ const addedTask = (function(){
 
         if(priorityNode.value !== 'SELECT PRIORITY'){
             priorityContainer.classList.add('task-priority');
+            priorityContainer.classList.add('hide');
 
             priority.textContent = priorityNode.value;
             priorityContainer.appendChild(priority);
@@ -281,25 +283,82 @@ const addedTask = (function(){
         }
     }
 
+    function createCheckBtn(){
+        const checkBtn = document.createElement('button');
+
+        checkBtn.classList.add('check-btn');
+
+        return checkBtn;
+    }
+
+    function addSvgIcon(className, pathAtt){
+        const svgIconContainer = document.createElement('div');
+        const svgIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+        svgIcon.setAttribute('viewBox', '0 0 24 24');
+        path.setAttribute('d', pathAtt);
+
+        svgIconContainer.classList.add('svg-icon-container');
+        svgIconContainer.classList.add(className);
+
+        svgIcon.appendChild(path);
+        svgIconContainer.appendChild(svgIcon);
+
+        return svgIconContainer;
+    }
+
     function createAddedTask(){
         const content = document.querySelector('.content');
 
         const taskContainer = document.createElement('div');
+        const checkBtnContainer = document.createElement('div');
+        const userInputContainer = document.createElement('div');
 
         taskContainer.classList.add('task-container');
+        checkBtnContainer.classList.add('check-btn-container');
+        userInputContainer.classList.add('user-input-container');
         
-        taskContainer.appendChild(createTaskTitle());
-        taskContainer.appendChild(createTaskDueDate());
+        taskContainer.appendChild(checkBtnContainer);
+        taskContainer.appendChild(userInputContainer);
+        taskContainer.appendChild(addSvgIcon('up-down-icon', 'M14,8H11V14H6V8H3L8.5,2L14,8M15.5,22L21,16H18V10H13V16H10L15.5,22Z'));
+        taskContainer.appendChild(addSvgIcon('garbage-icon', 'M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z'));
+
+        checkBtnContainer.appendChild(createCheckBtn());
+
+        userInputContainer.appendChild(createTaskTitle());
+        userInputContainer.appendChild(createTaskDueDate());
 
         if(createTaskDescription()){
-            taskContainer.appendChild(createTaskDescription());
+            userInputContainer.appendChild(createTaskDescription());
         }
         
         if(createTaskPriority()){
-            taskContainer.appendChild(createTaskPriority());
+            userInputContainer.appendChild(createTaskPriority());
         }
 
+        PubSub.publish(ADDED_TASK_EVENT_LISTENER);
+
         content.appendChild(taskContainer);
+    }
+
+    function toggleAddedTaskDisplay(index){
+        const taskDescriptions = document.querySelectorAll('.task-description');
+        const taskPriorities = document.querySelectorAll('.task-priority');
+
+        console.log(index);
+        
+        taskDescriptions.forEach((description, descriptionIndex) => {
+            if(descriptionIndex === index){
+                description.classList.toggle('hide');
+            }
+        });
+
+        taskPriorities.forEach((priority, priorityIndex) => {
+            if(priorityIndex === index){
+                priority.classList.toggle('hide');
+            }
+        });
     }
 
     function checkRequiredInputValues(){
@@ -314,7 +373,7 @@ const addedTask = (function(){
         }
     }
 
-    return { checkRequiredInputValues };
+    return { checkRequiredInputValues, toggleAddedTaskDisplay };
 })();
 
 PubSub.subscribe(GENERAL_LAYOUT, content.createAddTaskBtn);
@@ -322,4 +381,5 @@ PubSub.subscribe(GENERAL_LAYOUT, taskAdder.openTaskAdder);
 PubSub.subscribe(SHOW_TASK_ADDER, taskAdder.clearInputs);
 PubSub.subscribe(SHOW_TASK_ADDER, taskAdder.toggleTaskAdderDisplay);
 PubSub.subscribe(SHOW_TASK_ADDER, content.toggleAddTaskBtnDisplay);
+PubSub.subscribe(EXTEND_TASK, addedTask.toggleAddedTaskDisplay);
 PubSub.subscribe(CHECK_TASK_INPUTS, addedTask.checkRequiredInputValues);
