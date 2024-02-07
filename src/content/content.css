@@ -105,6 +105,36 @@ select:focus {
     width: 90%;
     padding: 5px 20px;
     color: var(--dark-main-color);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.check-btn {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--main-color);
+}
+
+.task-container > div:nth-child(3) {
+    margin-left: auto;
+}
+
+.svg-icon-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+svg {
+    border: none;
+    padding: 0;
+    width: 30px;
+}
+
+path {
+    fill: var(--dark-main-color);
 }
 
 .hide {
