@@ -1,5 +1,5 @@
 import PubSub from 'pubsub-js';
-import { GENERAL_LAYOUT, SHOW_TASK_ADDER, TASK_ADDER_EVENT_LISTENER, CHECK_TASK_INPUTS, ADDED_TASK_EVENT_LISTENER, EXTEND_TASK } from '../barrel.js';
+import { GENERAL_LAYOUT, SHOW_TASK_ADDER, TASK_ADDER_EVENT_LISTENER, CHECK_TASK_INPUTS } from '../barrel.js';
 import { format } from 'date-fns';
 import './content.css';
 
@@ -308,6 +308,22 @@ const addedTask = (function(){
         return svgIconContainer;
     }
 
+    function createPriorityColor(taskContainer, priorityContainer){
+        const priorityValue = priorityContainer.firstChild.textContent;
+        
+        switch (priorityValue) {
+            case 'LOW' :
+                taskContainer.classList.add('green');
+                break;
+            case 'MEDIUM' :
+                taskContainer.classList.add('orange');
+                break;
+            case 'HIGH' :
+                taskContainer.classList.add('red');
+                break;
+        }
+    }
+
     function createAddedTask(){
         const content = document.querySelector('.content');
 
@@ -334,30 +350,54 @@ const addedTask = (function(){
         }
         
         if(createTaskPriority()){
-            userInputContainer.appendChild(createTaskPriority());
+            const priorityContainer = createTaskPriority();
+            userInputContainer.appendChild(priorityContainer);
+            createPriorityColor(taskContainer, priorityContainer);
         }
 
-        PubSub.publish(ADDED_TASK_EVENT_LISTENER);
-
         content.appendChild(taskContainer);
+        createAddedTaskEventListeners();
     }
 
-    function toggleAddedTaskDisplay(index){
-        const taskDescriptions = document.querySelectorAll('.task-description');
-        const taskPriorities = document.querySelectorAll('.task-priority');
+    function toggleAddedTaskDisplay(event){
+        const taskContainer = document.querySelectorAll('.task-container');
 
-        console.log(index);
-        
-        taskDescriptions.forEach((description, descriptionIndex) => {
-            if(descriptionIndex === index){
-                description.classList.toggle('hide');
+        taskContainer.forEach((container) => {
+            if(event.target.closest('.task-container') === container){
+                container.classList.add('active-task');
+
+                const descriptionNode = document.querySelector('.active-task .task-description');
+                const priorityNode = document.querySelector('.active-task .task-priority');
+
+                if(container.contains(descriptionNode)){
+                    descriptionNode.classList.toggle('hide');
+                }
+                
+                if(container.contains(priorityNode)){
+                    priorityNode.classList.toggle('hide');
+                }
+            }else{
+                container.classList.remove('active-task');
             }
         });
+    }
 
-        taskPriorities.forEach((priority, priorityIndex) => {
-            if(priorityIndex === index){
-                priority.classList.toggle('hide');
-            }
+    function removeAddedTask(event){
+        const currentTaskContainer = event.target.closest('.task-container');
+
+        currentTaskContainer.remove();
+    }
+
+    function createAddedTaskEventListeners(){
+        const upDownIcon = document.querySelectorAll('.up-down-icon');
+        const garbageIcon = document.querySelectorAll('.garbage-icon');
+
+        upDownIcon.forEach((icon) => {
+            icon.addEventListener('click', toggleAddedTaskDisplay);
+        });
+
+        garbageIcon.forEach((icon) => {
+            icon.addEventListener('click', removeAddedTask);
         });
     }
 
@@ -373,7 +413,7 @@ const addedTask = (function(){
         }
     }
 
-    return { checkRequiredInputValues, toggleAddedTaskDisplay };
+    return { checkRequiredInputValues };
 })();
 
 PubSub.subscribe(GENERAL_LAYOUT, content.createAddTaskBtn);
@@ -381,5 +421,4 @@ PubSub.subscribe(GENERAL_LAYOUT, taskAdder.openTaskAdder);
 PubSub.subscribe(SHOW_TASK_ADDER, taskAdder.clearInputs);
 PubSub.subscribe(SHOW_TASK_ADDER, taskAdder.toggleTaskAdderDisplay);
 PubSub.subscribe(SHOW_TASK_ADDER, content.toggleAddTaskBtnDisplay);
-PubSub.subscribe(EXTEND_TASK, addedTask.toggleAddedTaskDisplay);
 PubSub.subscribe(CHECK_TASK_INPUTS, addedTask.checkRequiredInputValues);
