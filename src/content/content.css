@@ -137,6 +137,18 @@ path {
     fill: var(--dark-main-color);
 }
 
+.green {
+    border-bottom: 6px solid var(--main-color);
+}
+
+.orange {
+    border-bottom: 6px solid #ebc789;
+}
+
+.red {
+    border-bottom: 6px solid #f97e7e;
+}
+
 .hide {
     display: none;
 }
