@@ -11,11 +11,6 @@ function addTaskToArray(taskObj){
     taskArr.push(taskObj);
 }
 
-function toggleTaskAdderDisplay(){
-    const taskAdder = document.querySelector('.task-adder-container');
-
-    taskAdder.classList.toggle('hide');
-}
 
 function clearTaskAdder(){
     const title = getTaskAdderInput('title');
@@ -69,7 +64,11 @@ function checkRequiredInputValues(){
 function resetPage(){
     clearTaskAdder();
     content.toggleAddTaskBtnDisplay();
-    toggleTaskAdderDisplay();
+    taskAdder.toggleTaskAdderDisplay();
+}
+
+function addDataIndexAttribute(obj, positionInArr){
+    obj.setAttribute('task-index', `${positionInArr}`);
 }
 
 function addTaskToPage(requiredInputs){
@@ -78,6 +77,7 @@ function addTaskToPage(requiredInputs){
         const newTask = taskObj.createTask();
         
         addTaskToArray(newTask);
+        addDataIndexAttribute(newTask, taskArr.length - 1);
         resetPage();
     }
 }
@@ -91,6 +91,7 @@ function toggleTaskObjDisplay(event){
 
             const descriptionNode = document.querySelector('.active-task .task-description');
             const priorityNode = document.querySelector('.active-task .task-priority');
+            const editIcon = document.querySelector('.active-task .edit-icon');
 
             if(container.contains(descriptionNode)){
                 descriptionNode.classList.toggle('hide');
@@ -99,40 +100,62 @@ function toggleTaskObjDisplay(event){
             if(container.contains(priorityNode)){
                 priorityNode.classList.toggle('hide');
             }
+
+            editIcon.classList.toggle('hide');
         }else{
             container.classList.remove('active-task');
         }
     });
 }
 
+function updateDataIndexAttribute(){
+    taskArr.forEach((taskObj, index) => {
+        taskObj.setAttribute('task-index', `${index}`);
+    });
+}
+
 function removeAddedTask(event){
     const currentTaskContainer = event.target.closest('.task-container');
 
+    let currentIndex = currentTaskContainer.getAttribute('task-index');
+
+    taskArr.forEach((taskObj) => {
+        let objIndex = taskObj.attributes[1].nodeValue;
+
+        if(objIndex === currentIndex){
+            taskArr.splice(currentIndex, 1);
+        }
+    });
+
     currentTaskContainer.remove();
+    updateDataIndexAttribute();
 }
 
-export function createAddedTaskEventListeners(){
+function toggleDeleteBtn(event){
+    const currentTaskContainer = event.target.closest('.task-container');
+    
+    const deleteBtn = currentTaskContainer.lastChild;
+
+    deleteBtn.classList.toggle('reveal');
+}
+
+export function createTaskEventListeners(){
     const upDownIcon = document.querySelectorAll('.up-down-icon');
     const garbageIcon = document.querySelectorAll('.garbage-icon');
+    const deleteBtn = document.querySelectorAll('.delete-btn');
 
     upDownIcon.forEach((icon) => {
         icon.addEventListener('click', toggleTaskObjDisplay);
     });
 
     garbageIcon.forEach((icon) => {
-        icon.addEventListener('click', removeAddedTask);
+        icon.addEventListener('click', toggleDeleteBtn);
+    });
+
+    deleteBtn.forEach((btn) => {
+        btn.addEventListener('click', removeAddedTask);
     });
 }
-
-
-
-
-
-
-
-
-
-
 
 
 function createAddBtnEventListener(){
