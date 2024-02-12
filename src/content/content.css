@@ -99,6 +99,17 @@ select:focus {
     outline: none;
 }
 
+.header-container {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-top: 18px;
+}
+
+.task-title > h3 {
+    margin: 0;
+}
+
 .task-container {
     background-color: var(--sub-color);
     border-radius: 10px;
@@ -108,6 +119,12 @@ select:focus {
     display: flex;
     align-items: center;
     gap: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.task-description {
+    max-width: 70%;
 }
 
 .check-btn {
@@ -121,9 +138,12 @@ select:focus {
     margin-left: auto;
 }
 
-.svg-icon-container {
+.icon-container {
     display: flex;
-    align-items: center;
+    gap: 10px;
+}
+
+.svg-icon-container {
     cursor: pointer;
 }
 
@@ -135,6 +155,24 @@ svg {
 
 path {
     fill: var(--dark-main-color);
+}
+
+.delete-btn {
+    background-color: #f35454;
+    color: white;
+    padding: 8px 30px;
+    border-radius: 10px 0 0 0;
+    position: absolute;
+    border: 1px solid #f35454;
+    font-weight: bold;
+    right: -125px;
+    bottom: 0;
+    transition: 1s;
+}
+
+.reveal {
+    right: 0;
+    bottom: 0;
 }
 
 .green {
@@ -165,6 +203,16 @@ path {
 
     .task-adder-container > div:nth-child(-n + 2) > label::before {
         content: '*';
+    }
+
+    .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .icon-container {
+        flex-direction: column;
     }
 }
 
