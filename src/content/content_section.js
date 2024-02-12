@@ -1,9 +1,9 @@
 import PubSub from 'pubsub-js';
-import { GENERAL_LAYOUT, SHOW_TASK_ADDER, TASK_ADDER_EVENT_LISTENER, CHECK_TASK_INPUTS } from '../barrel.js';
+import { TASK_ADDER_EVENT_LISTENER, getTaskAdderInput, createAddedTaskEventListeners } from '../barrel.js';
 import { format } from 'date-fns';
 import './content.css';
 
-const content = (function(){
+export const content = (function(){
 
     function getContentDiv(){
         const content = document.querySelector('.content');
@@ -36,7 +36,7 @@ const content = (function(){
     return { createAddTaskBtn, toggleAddTaskBtnDisplay, getContentDiv };
 })();
 
-const taskAdder = (function(){
+export const taskAdder = (function(){
 
     function createRequiredLabel(){
         const requiredContainer = document.createElement('div');
@@ -157,45 +157,7 @@ const taskAdder = (function(){
         return btnContainer;
     }
 
-    function getInput(inputName){
-        let input;
-
-        switch(inputName) {
-            case 'title' :
-                input = document.querySelector('#title');
-                break;
-            case 'date' :
-                input = document.querySelector('#date');
-                break;
-            case 'description' :
-                input = document.querySelector('#description');
-                break;
-            case 'priority' :
-                input = document.querySelector('select');
-                break;
-        }
-
-        return input;
-    }
-
-    function clearInputs(){
-        const title = getInput('title');
-        const date = getInput('date');
-        const description = getInput('description');
-        const priority = getInput('priority');
-
-        const inputs = [title, date, description, priority];
-
-        inputs.forEach((input) => {
-            if(input.type.includes('select')){
-                input.selectedIndex = 0; 
-            }else {
-                input.value = '';
-            }
-        });
-    }
-
-    function openTaskAdder(){
+    function createTaskAdder(){
         const content = document.querySelector('.content');
         const taskContainer = document.createElement('div');
         
@@ -212,19 +174,13 @@ const taskAdder = (function(){
         PubSub.publish(TASK_ADDER_EVENT_LISTENER);
     }
 
-    function toggleTaskAdderDisplay(){
-        const taskAdder = document.querySelector('.task-adder-container');
-
-        taskAdder.classList.toggle('hide');
-    }
-
-    return { openTaskAdder, getInput, clearInputs, toggleTaskAdderDisplay };
+return { createTaskAdder };
 })();
 
-const addedTask = (function(){
+export const task = function(){
    
     function createTaskTitle(){
-        const titleNode = taskAdder.getInput('title');
+        const titleNode = getTaskAdderInput('title');
         const taskHeaderContainer = document.createElement('div');
         const taskHeader = document.createElement('h3');
         
@@ -238,7 +194,7 @@ const addedTask = (function(){
     }
 
     function createTaskDueDate(){
-        const dateNode = taskAdder.getInput('date');
+        const dateNode = getTaskAdderInput('date');
         const dateContainer = document.createElement('div');
         const date = document.createElement('p');
 
@@ -252,7 +208,7 @@ const addedTask = (function(){
     }
 
     function createTaskDescription(){
-        const descriptionNode = taskAdder.getInput('description');
+        const descriptionNode = getTaskAdderInput('description');
         const descriptionContainer = document.createElement('div');
         const description = document.createElement('p');
 
@@ -268,7 +224,7 @@ const addedTask = (function(){
     }
 
     function createTaskPriority(){
-        const priorityNode = taskAdder.getInput('priority');
+        const priorityNode = getTaskAdderInput('priority');
         const priorityContainer = document.createElement('div');
         const priority = document.createElement('p');
 
@@ -324,7 +280,7 @@ const addedTask = (function(){
         }
     }
 
-    function createAddedTask(){
+    function createTask(){
         const content = document.querySelector('.content');
 
         const taskContainer = document.createElement('div');
@@ -357,68 +313,10 @@ const addedTask = (function(){
 
         content.appendChild(taskContainer);
         createAddedTaskEventListeners();
+
+        return taskContainer;
     }
 
-    function toggleAddedTaskDisplay(event){
-        const taskContainer = document.querySelectorAll('.task-container');
+    return { createTask };
+};
 
-        taskContainer.forEach((container) => {
-            if(event.target.closest('.task-container') === container){
-                container.classList.add('active-task');
-
-                const descriptionNode = document.querySelector('.active-task .task-description');
-                const priorityNode = document.querySelector('.active-task .task-priority');
-
-                if(container.contains(descriptionNode)){
-                    descriptionNode.classList.toggle('hide');
-                }
-                
-                if(container.contains(priorityNode)){
-                    priorityNode.classList.toggle('hide');
-                }
-            }else{
-                container.classList.remove('active-task');
-            }
-        });
-    }
-
-    function removeAddedTask(event){
-        const currentTaskContainer = event.target.closest('.task-container');
-
-        currentTaskContainer.remove();
-    }
-
-    function createAddedTaskEventListeners(){
-        const upDownIcon = document.querySelectorAll('.up-down-icon');
-        const garbageIcon = document.querySelectorAll('.garbage-icon');
-
-        upDownIcon.forEach((icon) => {
-            icon.addEventListener('click', toggleAddedTaskDisplay);
-        });
-
-        garbageIcon.forEach((icon) => {
-            icon.addEventListener('click', removeAddedTask);
-        });
-    }
-
-    function checkRequiredInputValues(){
-        const titleNode = taskAdder.getInput('title');
-        const dateNode = taskAdder.getInput('date');
-
-        if(titleNode.value && dateNode.value){
-            createAddedTask();
-            taskAdder.clearInputs();
-            content.toggleAddTaskBtnDisplay();
-            taskAdder.toggleTaskAdderDisplay();
-        }
-    }
-
-    return { checkRequiredInputValues };
-})();
-
-PubSub.subscribe(GENERAL_LAYOUT, content.createAddTaskBtn);
-PubSub.subscribe(GENERAL_LAYOUT, taskAdder.openTaskAdder);
-PubSub.subscribe(SHOW_TASK_ADDER, taskAdder.clearInputs);
-PubSub.subscribe(SHOW_TASK_ADDER, taskAdder.toggleTaskAdderDisplay);
-PubSub.subscribe(SHOW_TASK_ADDER, content.toggleAddTaskBtnDisplay);
-PubSub.subscribe(CHECK_TASK_INPUTS, addedTask.checkRequiredInputValues);
