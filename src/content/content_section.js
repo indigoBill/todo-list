@@ -1,5 +1,5 @@
 import PubSub from 'pubsub-js';
-import { TASK_ADDER_EVENT_LISTENER, getTaskAdderInput, createAddedTaskEventListeners } from '../barrel.js';
+import { TASK_ADDER_EVENT_LISTENER, getTaskAdderInput, createTaskEventListeners } from '../barrel.js';
 import { format } from 'date-fns';
 import './content.css';
 
@@ -174,7 +174,13 @@ export const taskAdder = (function(){
         PubSub.publish(TASK_ADDER_EVENT_LISTENER);
     }
 
-return { createTaskAdder };
+    function toggleTaskAdderDisplay(){
+        const taskAdder = document.querySelector('.task-adder-container');
+    
+        taskAdder.classList.toggle('hide');
+    }
+
+return { createTaskAdder, toggleTaskAdderDisplay };
 })();
 
 export const task = function(){
@@ -198,7 +204,7 @@ export const task = function(){
         const dateContainer = document.createElement('div');
         const date = document.createElement('p');
 
-        date.textContent = dateNode.value;
+        date.textContent = format(dateNode.value, 'MM-dd-yyyy');
 
         dateContainer.classList.add('task-date');
 
@@ -247,7 +253,7 @@ export const task = function(){
         return checkBtn;
     }
 
-    function addSvgIcon(className, pathAtt){
+    function addSvgIcon(className, pathAtt, hideByDefault){
         const svgIconContainer = document.createElement('div');
         const svgIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -260,6 +266,10 @@ export const task = function(){
 
         svgIcon.appendChild(path);
         svgIconContainer.appendChild(svgIcon);
+
+        if(hideByDefault){
+            svgIconContainer.classList.add('hide');
+        }
 
         return svgIconContainer;
     }
@@ -280,25 +290,40 @@ export const task = function(){
         }
     }
 
+    function createDeleteBtn(){
+        const deleteBtn = document.createElement('button');
+
+        deleteBtn.classList.add('delete-btn');
+
+        deleteBtn.textContent = 'DELETE?';
+
+        return deleteBtn;
+    }
+
     function createTask(){
         const content = document.querySelector('.content');
 
         const taskContainer = document.createElement('div');
         const checkBtnContainer = document.createElement('div');
+        const headerContainer = document.createElement('div');
         const userInputContainer = document.createElement('div');
+        const iconContainer = document.createElement('div');
 
         taskContainer.classList.add('task-container');
         checkBtnContainer.classList.add('check-btn-container');
+        headerContainer.classList.add('header-container');
         userInputContainer.classList.add('user-input-container');
+        iconContainer.classList.add('icon-container');
         
-        taskContainer.appendChild(checkBtnContainer);
-        taskContainer.appendChild(userInputContainer);
-        taskContainer.appendChild(addSvgIcon('up-down-icon', 'M14,8H11V14H6V8H3L8.5,2L14,8M15.5,22L21,16H18V10H13V16H10L15.5,22Z'));
-        taskContainer.appendChild(addSvgIcon('garbage-icon', 'M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z'));
+        iconContainer.appendChild(addSvgIcon('up-down-icon', 'M14,8H11V14H6V8H3L8.5,2L14,8M15.5,22L21,16H18V10H13V16H10L15.5,22Z'));
+        iconContainer.appendChild(addSvgIcon('garbage-icon', 'M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z'));
 
         checkBtnContainer.appendChild(createCheckBtn());
 
-        userInputContainer.appendChild(createTaskTitle());
+        headerContainer.appendChild(createTaskTitle());
+        headerContainer.appendChild(addSvgIcon('edit-icon', 'M14.06,9L15,9.94L5.92,19H5V18.08L14.06,9M17.66,3C17.41,3 17.15,3.1 16.96,3.29L15.13,5.12L18.88,8.87L20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18.17,3.09 17.92,3 17.66,3M14.06,6.19L3,17.25V21H6.75L17.81,9.94L14.06,6.19Z', true));
+
+        userInputContainer.appendChild(headerContainer);
         userInputContainer.appendChild(createTaskDueDate());
 
         if(createTaskDescription()){
@@ -311,8 +336,13 @@ export const task = function(){
             createPriorityColor(taskContainer, priorityContainer);
         }
 
+        taskContainer.appendChild(checkBtnContainer);
+        taskContainer.appendChild(userInputContainer);
+        taskContainer.appendChild(iconContainer);
+        taskContainer.appendChild(createDeleteBtn());
+
         content.appendChild(taskContainer);
-        createAddedTaskEventListeners();
+        createTaskEventListeners();
 
         return taskContainer;
     }
