@@ -123,10 +123,6 @@ select:focus {
     overflow: hidden;
 }
 
-.task-description {
-    max-width: 70%;
-}
-
 .check-btn {
     height: 20px;
     width: 20px;
@@ -136,6 +132,11 @@ select:focus {
 
 .task-container > div:nth-child(3) {
     margin-left: auto;
+}
+
+.user-input-container {
+    max-width: 70%;
+    width: 100%;
 }
 
 .icon-container {
