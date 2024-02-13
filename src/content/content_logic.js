@@ -1,4 +1,5 @@
 import PubSub from 'pubsub-js';
+import { format } from 'date-fns';
 
 export const TASK_ADDER_EVENT_LISTENER = 'add event listeners to buttons in task adder container';
 
@@ -9,24 +10,6 @@ const taskArr = [];
 
 function addTaskToArray(taskObj){
     taskArr.push(taskObj);
-}
-
-
-function clearTaskAdder(){
-    const title = getTaskAdderInput('title');
-    const date = getTaskAdderInput('date');
-    const description = getTaskAdderInput('description');
-    const priority = getTaskAdderInput('priority');
-
-    const inputs = [title, date, description, priority];
-
-    inputs.forEach((input) => {
-        if(input.type.includes('select')){
-            input.selectedIndex = 0; 
-        }else {
-            input.value = '';
-        }
-    });
 }
 
 export function getTaskAdderInput(inputName){
@@ -50,6 +33,53 @@ export function getTaskAdderInput(inputName){
     return input;
 }
 
+function clearTaskAdder(){
+    const title = getTaskAdderInput('title');
+    const date = getTaskAdderInput('date');
+    const description = getTaskAdderInput('description');
+    const priority = getTaskAdderInput('priority');
+
+    const inputs = [title, date, description, priority];
+
+    inputs.forEach((input) => {
+        if(input.type.includes('select')){
+            input.selectedIndex = 0; 
+        }else {
+            input.value = '';
+        }
+    });
+}
+
+function toggleEditMode(...elements){
+    for(const ele of elements){
+        ele.classList.toggle('edit');
+    }
+}
+
+function editTask(event){
+    const currentTaskContainer = event.target.closest('.task-container');
+    const taskInputContainer = currentTaskContainer.children[1];
+    
+    const addBtn = document.querySelector('.add-btn');
+
+    toggleEditMode(addBtn, currentTaskContainer);
+
+    for(const input of taskInputContainer.children){
+
+        if(input.className === 'header-container'){
+            getTaskAdderInput('title').value = input.textContent;
+        }else if(input.className === 'task-date'){
+            getTaskAdderInput('date').value = format(input.textContent, 'yyyy-MM-dd');
+        }else if(input.className === 'task-description'){
+            getTaskAdderInput('description').value = input.textContent;
+        }else if(input.className === 'priority'){
+            getTaskAdderInput('priority').value = input.textContent;
+        }
+    }
+
+    togglePageDisplay();
+}
+
 function checkRequiredInputValues(){
     const titleNode = getTaskAdderInput('title');
     const dateNode = getTaskAdderInput('date');
@@ -61,14 +91,24 @@ function checkRequiredInputValues(){
     return false;
 }
 
-function resetPage(){
-    clearTaskAdder();
+function togglePageDisplay(){
     content.toggleAddTaskBtnDisplay();
     taskAdder.toggleTaskAdderDisplay();
 }
 
+function resetPage(){
+    clearTaskAdder();
+    togglePageDisplay();
+}
+
 function addDataIndexAttribute(obj, positionInArr){
     obj.setAttribute('task-index', `${positionInArr}`);
+}
+
+function updateDataIndexAttribute(){
+    taskArr.forEach((taskObj, index) => {
+        taskObj.setAttribute('task-index', `${index}`);
+    });
 }
 
 function addTaskToPage(requiredInputs){
@@ -80,6 +120,47 @@ function addTaskToPage(requiredInputs){
         addDataIndexAttribute(newTask, taskArr.length - 1);
         resetPage();
     }
+}
+
+function updateTask(requiredInputs){
+    const edittedTaskContainer = document.querySelector('.task-container.edit');
+
+    const addBtn = document.querySelector('.add-btn');
+
+    if(requiredInputs){
+
+        for(const input of edittedTaskContainer.children){
+
+            if(input.className === 'header-container'){
+                input.textContent = getTaskAdderInput('title').value;
+            }else if(input.className === 'task-date'){
+                input.textContent = format(getTaskAdderInput('date').value, 'MM-dd-yyyy');
+            }else if(input.className === 'task-description'){
+                input.textContent = getTaskAdderInput('description').value;
+            }else if(input.className === 'priority'){
+                input.textContent = getTaskAdderInput('priority').value;
+            }
+        }
+    }
+
+    toggleEditMode(addBtn, edittedTaskContainer);
+}
+
+function removeTaskFromPage(event){
+    const currentTaskContainer = event.target.closest('.task-container');
+
+    let currentIndex = currentTaskContainer.getAttribute('task-index');
+
+    taskArr.forEach((taskObj) => {
+        let objIndex = taskObj.attributes[1].nodeValue;
+
+        if(objIndex === currentIndex){
+            taskArr.splice(currentIndex, 1);
+        }
+    });
+
+    currentTaskContainer.remove();
+    updateDataIndexAttribute();
 }
 
 function toggleTaskObjDisplay(event){
@@ -108,29 +189,6 @@ function toggleTaskObjDisplay(event){
     });
 }
 
-function updateDataIndexAttribute(){
-    taskArr.forEach((taskObj, index) => {
-        taskObj.setAttribute('task-index', `${index}`);
-    });
-}
-
-function removeAddedTask(event){
-    const currentTaskContainer = event.target.closest('.task-container');
-
-    let currentIndex = currentTaskContainer.getAttribute('task-index');
-
-    taskArr.forEach((taskObj) => {
-        let objIndex = taskObj.attributes[1].nodeValue;
-
-        if(objIndex === currentIndex){
-            taskArr.splice(currentIndex, 1);
-        }
-    });
-
-    currentTaskContainer.remove();
-    updateDataIndexAttribute();
-}
-
 function toggleDeleteBtn(event){
     const currentTaskContainer = event.target.closest('.task-container');
     
@@ -143,6 +201,7 @@ export function createTaskEventListeners(){
     const upDownIcon = document.querySelectorAll('.up-down-icon');
     const garbageIcon = document.querySelectorAll('.garbage-icon');
     const deleteBtn = document.querySelectorAll('.delete-btn');
+    const editIcon = document.querySelectorAll('.edit-icon');
 
     upDownIcon.forEach((icon) => {
         icon.addEventListener('click', toggleTaskObjDisplay);
@@ -153,8 +212,12 @@ export function createTaskEventListeners(){
     });
 
     deleteBtn.forEach((btn) => {
-        btn.addEventListener('click', removeAddedTask);
+        btn.addEventListener('click', removeTaskFromPage);
     });
+
+    // editIcon.forEach((icon) => {
+    //     icon.addEventListener('click', editTask);
+    // });
 }
 
 
@@ -162,7 +225,14 @@ function createAddBtnEventListener(){
     const addBtn = document.querySelector('.add-btn');
 
     addBtn.addEventListener('click', () => {
+        // if(addBtn.classList.contains('edit')){
+        //     updateTask(checkRequiredInputValues());
+        // }else{
+        //     addTaskToPage(checkRequiredInputValues());
+        // }
+
         addTaskToPage(checkRequiredInputValues());
+
     });
 }
 
@@ -183,7 +253,7 @@ function createAddTaskBtnEventListener(){
     const addTaskBtn = document.querySelector('.add-task-btn');
 
     addTaskBtn.addEventListener('click', () => {
-        resetPage();
+        togglePageDisplay();
     });
 }
 
