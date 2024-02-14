@@ -1,6 +1,6 @@
 import PubSub from 'pubsub-js';
 import { TASK_ADDER_EVENT_LISTENER, getTaskAdderInput, createTaskEventListeners } from '../barrel.js';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import './content.css';
 
 export const content = (function(){
@@ -204,7 +204,9 @@ export const task = function(){
         const dateContainer = document.createElement('div');
         const date = document.createElement('p');
 
-        date.textContent = format(dateNode.value, 'MM-dd-yyyy');
+        const isoDate = parseISO(dateNode.value);
+
+        date.textContent = format(isoDate, 'MM-dd-yyyy');
 
         dateContainer.classList.add('task-date');
 
