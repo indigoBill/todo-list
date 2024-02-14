@@ -7,6 +7,7 @@ export const TASK_ADDER_EVENT_LISTENER = 'add event listeners to buttons in task
 import { GENERAL_LAYOUT, EVENT_LISTENERS, taskAdder, content, task } from '../barrel.js';
 
 const taskArr = [];
+let currentlyEditting = false;
 
 function addTaskToArray(taskObj){
     taskArr.push(taskObj);
@@ -50,33 +51,69 @@ function clearTaskAdder(){
     });
 }
 
-function toggleEditMode(...elements){
-    for(const ele of elements){
-        ele.classList.toggle('edit');
-    }
+function getEdittedTaskObj(){
+    const edittedObj = document.querySelector('.task-container.edit');
+
+    return edittedObj;
+}
+
+function toggleEdittedTaskObjDisplay(){
+    let task = getEdittedTaskObj();
+
+    task.classList.toggle('hide');
+}
+
+function removeTask(taskObj){
+    let currentIndex = taskObj.getAttribute('task-index');
+
+    taskArr.forEach((obj) => {
+        let objIndex = obj.attributes[1].nodeValue;
+
+        if(objIndex === currentIndex){
+            taskArr.splice(currentIndex, 1);
+        }
+    });
+
+    taskObj.remove();
+    updateDataIndexAttribute();
+}
+
+function removeEdittedTask(){
+    const currentTaskContainer = getEdittedTaskObj();
+
+    removeTask(currentTaskContainer);
+}
+
+function addEditClass(taskObj){
+    const allTaskContainers = document.querySelectorAll('.task-container');
+
+    allTaskContainers.forEach((container) => {
+        container.classList.remove('edit');
+    });
+
+    taskObj.classList.add('edit');
 }
 
 function editTask(event){
     const currentTaskContainer = event.target.closest('.task-container');
     const taskInputContainer = currentTaskContainer.children[1];
+
+    addEditClass(currentTaskContainer);
     
-    const addBtn = document.querySelector('.add-btn');
-
-    toggleEditMode(addBtn, currentTaskContainer);
-
     for(const input of taskInputContainer.children){
-
         if(input.className === 'header-container'){
             getTaskAdderInput('title').value = input.textContent;
         }else if(input.className === 'task-date'){
             getTaskAdderInput('date').value = format(input.textContent, 'yyyy-MM-dd');
         }else if(input.className === 'task-description'){
             getTaskAdderInput('description').value = input.textContent;
-        }else if(input.className === 'priority'){
+        }else if(input.className === 'task-priority'){
             getTaskAdderInput('priority').value = input.textContent;
         }
     }
 
+    currentlyEditting = true;
+    toggleEdittedTaskObjDisplay();
     togglePageDisplay();
 }
 
@@ -122,48 +159,13 @@ function addTaskToPage(requiredInputs){
     }
 }
 
-function updateTask(requiredInputs){
-    const edittedTaskContainer = document.querySelector('.task-container.edit');
-
-    const addBtn = document.querySelector('.add-btn');
-
-    if(requiredInputs){
-
-        for(const input of edittedTaskContainer.children){
-
-            if(input.className === 'header-container'){
-                input.textContent = getTaskAdderInput('title').value;
-            }else if(input.className === 'task-date'){
-                input.textContent = format(getTaskAdderInput('date').value, 'MM-dd-yyyy');
-            }else if(input.className === 'task-description'){
-                input.textContent = getTaskAdderInput('description').value;
-            }else if(input.className === 'priority'){
-                input.textContent = getTaskAdderInput('priority').value;
-            }
-        }
-    }
-
-    toggleEditMode(addBtn, edittedTaskContainer);
-}
-
 function removeTaskFromPage(event){
     const currentTaskContainer = event.target.closest('.task-container');
 
-    let currentIndex = currentTaskContainer.getAttribute('task-index');
-
-    taskArr.forEach((taskObj) => {
-        let objIndex = taskObj.attributes[1].nodeValue;
-
-        if(objIndex === currentIndex){
-            taskArr.splice(currentIndex, 1);
-        }
-    });
-
-    currentTaskContainer.remove();
-    updateDataIndexAttribute();
+    removeTask(currentTaskContainer);
 }
 
-function toggleTaskObjDisplay(event){
+function extendTaskObjDisplay(event){
     const taskContainer = document.querySelectorAll('.task-container');
 
     taskContainer.forEach((container) => {
@@ -197,14 +199,19 @@ function toggleDeleteBtn(event){
     deleteBtn.classList.toggle('reveal');
 }
 
+function completeTask(event){
+    event.target.classList.toggle('checked');
+}
+
 export function createTaskEventListeners(){
     const upDownIcon = document.querySelectorAll('.up-down-icon');
     const garbageIcon = document.querySelectorAll('.garbage-icon');
     const deleteBtn = document.querySelectorAll('.delete-btn');
     const editIcon = document.querySelectorAll('.edit-icon');
+    const checkBtn = document.querySelectorAll('.check-btn');
 
     upDownIcon.forEach((icon) => {
-        icon.addEventListener('click', toggleTaskObjDisplay);
+        icon.addEventListener('click', extendTaskObjDisplay);
     });
 
     garbageIcon.forEach((icon) => {
@@ -215,24 +222,25 @@ export function createTaskEventListeners(){
         btn.addEventListener('click', removeTaskFromPage);
     });
 
-    // editIcon.forEach((icon) => {
-    //     icon.addEventListener('click', editTask);
-    // });
-}
+    editIcon.forEach((icon) => {
+        icon.addEventListener('click', editTask);
+    });
 
+    checkBtn.forEach((btn) => {
+        btn.addEventListener('click', completeTask);
+    });
+}
 
 function createAddBtnEventListener(){
     const addBtn = document.querySelector('.add-btn');
 
     addBtn.addEventListener('click', () => {
-        // if(addBtn.classList.contains('edit')){
-        //     updateTask(checkRequiredInputValues());
-        // }else{
-        //     addTaskToPage(checkRequiredInputValues());
-        // }
-
         addTaskToPage(checkRequiredInputValues());
 
+        if(currentlyEditting){
+            removeEdittedTask();
+            currentlyEditting = false;
+        }
     });
 }
 
@@ -240,6 +248,11 @@ function createCancelBtnEventListener(){
     const cancelBtn = document.querySelector('.cancel-btn');
 
     cancelBtn.addEventListener('click', () => {
+        if(currentlyEditting){
+            toggleEdittedTaskObjDisplay();
+            currentlyEditting = false;
+        }
+
         resetPage();
     });
 }
