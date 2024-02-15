@@ -8,12 +8,14 @@
 @media screen and (max-width: 560px) {
     .side-bar {
         translate: -100%;
+        z-index: 1;
     }
 }
 
 .side-bar-cover {
     translate: 0;
     position: relative;
+    z-index: 1;
 }
 
 .side-bar-push {
@@ -27,6 +29,7 @@
     gap: 50px;
     padding: 50px 0 20px 0;
     color: var(--dark-main-color);
+    min-width: 220px;
 }
 
 .divider-container {
@@ -50,21 +53,28 @@
 
 .filter-option {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     padding: 10px 40px;
+    min-height: 40px;
 }
 
-.filter-option>div:first-child {
+.filter-option > div:first-child {
     width: 100px;
+    text-align: center;
 }
 
-/*USE TO DISPLAY NUMBER OF TO-DOs IN EACH CATEGORY
-USE JS TO MAKE CIRCLE APPEAR WHEN THERE ARE TASKS THAT FIT THE CATEGORY*/
 .task-count {
-    width: 20px;
+    width: 40px;
+    min-width: fit-content;
     height: 20px;
     background-color: var(--main-color);
-    border-radius: 50%;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /*CHECK IF THIS WORKS ON OLDER BROWSERS SINCE INITIAL-VALUE IS STILL EXPERIMENTAL*/
@@ -75,14 +85,14 @@ USE JS TO MAKE CIRCLE APPEAR WHEN THERE ARE TASKS THAT FIT THE CATEGORY*/
 }
 
 .filter-option,
-.projects-list>div,
+.project,
 .add-project-btn {
     transition: --color-start 1s;
     background: linear-gradient(to right, white var(--color-start), var(--sub-color) 0);
 }
 
 .filter-option:hover,
-.projects-list > div:hover,
+.project:hover,
 .add-project-btn:hover {
     cursor: pointer;
     --color-start: 100%;
@@ -105,7 +115,7 @@ USE JS TO MAKE CIRCLE APPEAR WHEN THERE ARE TASKS THAT FIT THE CATEGORY*/
     font-size: 18px;
 }
 
-.projects-list>div {
+.project {
     padding: 10px;
 }
 
@@ -116,6 +126,10 @@ USE JS TO MAKE CIRCLE APPEAR WHEN THERE ARE TASKS THAT FIT THE CATEGORY*/
     font-size: 14px;
     color: var(--dark-main-color);
     font-weight: bold;
+}
+
+.current-tab {
+    background: white;
 }
 
 
