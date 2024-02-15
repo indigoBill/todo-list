@@ -3,8 +3,7 @@ import { format } from 'date-fns';
 
 export const TASK_ADDER_EVENT_LISTENER = 'add event listeners to buttons in task adder container';
 
-
-import { GENERAL_LAYOUT, EVENT_LISTENERS, taskAdder, content, task } from '../barrel.js';
+import { GENERAL_LAYOUT, EVENT_LISTENERS, TASK_COUNT, taskAdder, content, task } from '../barrel.js';
 
 const taskArr = [];
 let currentlyEditting = false;
@@ -156,6 +155,8 @@ function addTaskToPage(requiredInputs){
         addTaskToArray(newTask);
         addDataIndexAttribute(newTask, taskArr.length - 1);
         resetPage();
+
+        PubSub.publish(TASK_COUNT);
     }
 }
 
@@ -163,6 +164,8 @@ function removeTaskFromPage(event){
     const currentTaskContainer = event.target.closest('.task-container');
 
     removeTask(currentTaskContainer);
+    
+    PubSub.publish(TASK_COUNT);
 }
 
 function extendTaskObjDisplay(event){
@@ -270,6 +273,11 @@ function createAddTaskBtnEventListener(){
     addTaskBtn.addEventListener('click', () => {
         togglePageDisplay();
     });
+}
+
+function showCurrentTabContent(){
+
+
 }
 
 PubSub.subscribe(GENERAL_LAYOUT, content.createAddTaskBtn);
