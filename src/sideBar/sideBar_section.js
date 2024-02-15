@@ -1,127 +1,110 @@
 import PubSub from 'pubsub-js';
-import { GENERAL_LAYOUT, SIDEBAR_DISPLAY } from '../barrel.js';
+import { GENERAL_LAYOUT } from '../barrel.js';
 import './sideBar.css';
 
-const sideBar = (function(){
-    function createFilterOption(parentElement, filterType){
-        const filterOption = document.createElement('div');
-        const filterOptionText = document.createElement('div');
-        const taskCount = document.createElement('div');
-    
-        filterOption.classList.add('filter-option');
-        filterOptionText.textContent = filterType;
-    
-        taskCount.classList.add('task-count');
-    
-        filterOption.appendChild(filterOptionText);
-        filterOption.appendChild(taskCount);
-    
-        parentElement.appendChild(filterOption);
-    }
-    
-    function createSideBarTextDiv(parentElement, text, className){
-        const div = document.createElement('div');
-        
-        if(text) div.textContent = text;
-    
-        if(className) div.classList.add(`${className}`);
-    
-        parentElement.appendChild(div);
-    }
-    
-    function createSideBarFilterOptions(){
-        const sideBarFilterOptions = document.createElement('div');
-        sideBarFilterOptions.classList.add('side-bar-filter-options');
 
-        createFilterOption(sideBarFilterOptions, 'INBOX');
-        createFilterOption(sideBarFilterOptions, 'TODAY');
-        createFilterOption(sideBarFilterOptions, 'UPCOMING');
-        createFilterOption(sideBarFilterOptions, 'ANYTIME');
+function createFilterOption(parentElement, filterType, className){
+    const filterOption = document.createElement('div');
+    const filterOptionText = document.createElement('div');
+    const taskCount = document.createElement('div');
 
-        return sideBarFilterOptions;
+    filterOption.classList.add('filter-option');
+    filterOption.classList.add(filterType.toLowerCase());
+
+    filterOptionText.textContent = filterType;
+
+    if(className){
+        filterOption.classList.add(className);
     }
 
-    function createProjects(){
-        const projectsContainer = document.createElement('div');
-        const projectsList = document.createElement('div');
+    filterOption.appendChild(filterOptionText);
+    filterOption.appendChild(taskCount);
 
-        projectsContainer.classList.add('projects-container');
-        projectsList.classList.add('projects-list');
+    parentElement.appendChild(filterOption);
+}
 
-        createSideBarTextDiv(projectsContainer, 'PROJECTS', 'projects-title');
+function createSideBarTextDiv(parentElement, text, className){
+    const div = document.createElement('div');
+    
+    if(text) div.textContent = text;
 
-        projectsContainer.appendChild(projectsList);
+    if(className) div.classList.add(`${className}`);
 
-        createSideBarTextDiv(projectsList, 'FILLER 1');
-        createSideBarTextDiv(projectsList, 'FILLER 2');
-        createSideBarTextDiv(projectsList, 'FILLER 3');
+    parentElement.appendChild(div);
+}
 
-        return projectsContainer;
-    }
+function createSideBarFilterOptions(){
+    const sideBarFilterOptions = document.createElement('div');
+    sideBarFilterOptions.classList.add('side-bar-filter-options');
 
-    function createAddProjectBtn(){
-        const btnContainer = document.createElement('div');
-        const addProjectBtn = document.createElement('button');
+    createFilterOption(sideBarFilterOptions, 'INBOX', 'current-tab');
+    createFilterOption(sideBarFilterOptions, 'TODAY');
+    createFilterOption(sideBarFilterOptions, 'UPCOMING');
+    createFilterOption(sideBarFilterOptions, 'ANYTIME');
 
-        btnContainer.classList.add('project-btn-container');
-        addProjectBtn.classList.add('add-project-btn');
+    return sideBarFilterOptions;
+}
 
-        addProjectBtn.textContent = '+ ADD PROJECT';
-        
-        btnContainer.appendChild(addProjectBtn);
+function createProjects(){
+    const projectsContainer = document.createElement('div');
+    const projectsList = document.createElement('div');
 
-        return btnContainer;
-    }
+    projectsContainer.classList.add('projects-container');
+    projectsList.classList.add('projects-list');
 
-    function createSideBarDivider(){
-        const dividerContainer = document.createElement('div');
-        const divider = document.createElement('div');
+    createSideBarTextDiv(projectsContainer, 'PROJECTS', 'projects-title');
 
-        dividerContainer.classList.add('divider-container');
-        divider.classList.add('side-bar-divider');
+    projectsContainer.appendChild(projectsList);
 
-        dividerContainer.appendChild(divider);
+    createSideBarTextDiv(projectsList, 'FILLER 1', 'project');
+    createSideBarTextDiv(projectsList, 'FILLER 2', 'project');
+    createSideBarTextDiv(projectsList, 'FILLER 3', 'project');
 
-        return dividerContainer;
-    }
+    return projectsContainer;
+}
 
-    function createSideBarSection(){
-        const sideBar = document.querySelector('.side-bar');
-        const sideBarContentContainer = document.createElement('div');
+function createAddProjectBtn(){
+    const btnContainer = document.createElement('div');
+    const addProjectBtn = document.createElement('button');
 
-        sideBarContentContainer.classList.add('side-bar-content-container');
-        
-        sideBar.appendChild(sideBarContentContainer);
-        sideBarContentContainer.appendChild(createSideBarFilterOptions());
-        sideBarContentContainer.appendChild(createSideBarDivider());
-        sideBarContentContainer.appendChild(createProjects());
-        sideBarContentContainer.appendChild(createSideBarDivider());
-        sideBarContentContainer.appendChild(createAddProjectBtn());
+    btnContainer.classList.add('project-btn-container');
+    addProjectBtn.classList.add('add-project-btn');
 
-    }
+    addProjectBtn.textContent = '+ ADD PROJECT';
+    
+    btnContainer.appendChild(addProjectBtn);
 
-    return { createSideBarSection };
-})();
+    return btnContainer;
+}
+
+function createSideBarDivider(){
+    const dividerContainer = document.createElement('div');
+    const divider = document.createElement('div');
+
+    dividerContainer.classList.add('divider-container');
+    divider.classList.add('side-bar-divider');
+
+    dividerContainer.appendChild(divider);
+
+    return dividerContainer;
+}
+
+function createSideBarSection(){
+    const sideBar = document.querySelector('.side-bar');
+    const sideBarContentContainer = document.createElement('div');
+
+    sideBarContentContainer.classList.add('side-bar-content-container');
+    
+    sideBar.appendChild(sideBarContentContainer);
+    sideBarContentContainer.appendChild(createSideBarFilterOptions());
+    sideBarContentContainer.appendChild(createSideBarDivider());
+    sideBarContentContainer.appendChild(createProjects());
+    sideBarContentContainer.appendChild(createSideBarDivider());
+    sideBarContentContainer.appendChild(createAddProjectBtn());
+
+}
 
 
-const sideBarDynamic = (function(){
-    function revealSideBar(){
-        const sideBar = document.querySelector('.side-bar');
-        const mediaQuery = window.matchMedia('(max-width: 560px)');
 
-        if(mediaQuery.matches){
-            sideBar.classList.toggle('side-bar-cover');
-            sideBar.classList.remove('side-bar-push');
-        }else{
-            sideBar.classList.toggle('side-bar-push');
-            sideBar.classList.remove('side-bar-cover');
-        }
-    }
-
-    return { revealSideBar };
-})();
-
-
-PubSub.subscribe(GENERAL_LAYOUT, sideBar.createSideBarSection);
-PubSub.subscribe(SIDEBAR_DISPLAY, sideBarDynamic.revealSideBar);
+PubSub.subscribe(GENERAL_LAYOUT, createSideBarSection);
 
