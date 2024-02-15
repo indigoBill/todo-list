@@ -200,6 +200,8 @@ function toggleDeleteBtn(event){
 }
 
 function completeTask(event){
+    const currentTaskContainer = event.target.closest('.task-container');
+    currentTaskContainer.classList.toggle('completed');
     event.target.classList.toggle('checked');
 }
 
