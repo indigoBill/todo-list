@@ -8,8 +8,11 @@ export * from './main/main_section.js';
 
 export * from './sideBar/sideBar_section.js';
 
-//INCLUDES: SHOW_TASK_ADDER, CHECK_TASK_INPUTS, TASK_ADDER_EVENT_LISTENER, EXTEND_TASK, ADDED_TASK_EVENT_LISTENER
-export * from './content/content_logic.js';
+export * from './sideBar/sideBar_logic.js';
 
 export * from './content/content_section.js';
+
+//INCLUDES: TASK_ADDER_EVENT_LISTENER
+export * from './content/content_logic.js';
+
 
