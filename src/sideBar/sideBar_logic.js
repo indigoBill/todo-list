@@ -1,6 +1,6 @@
 import PubSub from "pubsub-js";
-import { GENERAL_LAYOUT, SIDEBAR_DISPLAY } from '../barrel.js';
-import { isToday } from 'date-fns';
+import { GENERAL_LAYOUT, SIDEBAR_DISPLAY, createSideBarTextDiv } from '../barrel.js';
+import { isToday, isThisWeek } from 'date-fns';
 
 export const TASK_COUNT = 'update the task counters in the sidebar';
 
@@ -31,15 +31,21 @@ function selectCurrentTab(event){
 
 function addSideBarEventListeners(){
     const sideBarElements = document.querySelectorAll('.filter-option, .project');
+    const addProjectBtn = document.querySelector('.add-project-btn');
+    const projectInput = document.querySelector('.project-input');
+
 
     sideBarElements.forEach((element) => {
         element.addEventListener('click', (event) => {
             removeCurrentTab();
             selectCurrentTab(event);
         });
-    })
-}
+    });
 
+    addProjectBtn.addEventListener('click', toggleProjectInputDisplay);
+
+    projectInput.addEventListener('keydown', addProject);
+}
 
 function getAllTasks(){
     const allTasks = document.querySelectorAll('[task-index]');
@@ -54,30 +60,39 @@ function updateInboxTab(){
 
 }
 
-function updateTodayTab(){
-    let tasksDueToday = 0;
+function updateTodayAndThisWeekTab(){
     const todayTaskCounter = document.querySelector('.today > div:last-child');    
-    const allTaskDates = document.querySelectorAll('.task-date');
+    const thisWeekTaskCounter = document.querySelector('.this-week > div:last-child');
+    const allTasks = getAllTasks();
+    let tasksDueToday = 0;
+    let tasksDueThisWeek = 0;
 
-    allTaskDates.forEach((date) => {
-        if(isToday(date.textContent)){
+    allTasks.forEach((task) => {
+        const taskDate = task.querySelector('.task-date');
+
+        if(isToday(taskDate.textContent)){
             tasksDueToday++;
             todayTaskCounter.textContent = tasksDueToday;
         }
+
+        if(isThisWeek(taskDate.textContent)){
+            tasksDueThisWeek++;
+            thisWeekTaskCounter.textContent = tasksDueThisWeek;
+        }
     });
 
-    if(tasksDueToday > 0){
-        todayTaskCounter.classList.add('task-count');
-    }else{
+    todayTaskCounter.classList.add('task-count');
+    thisWeekTaskCounter.classList.add('task-count');
+
+    if(tasksDueToday < 1){
         todayTaskCounter.textContent = '';
         todayTaskCounter.classList.remove('task-count');
     }
-}
 
-
-function updateUpcomingTab(){
-    //IF TASK DATE IS WITHIN THE WEEK COUNT TO UPCOMING TAB
-
+    if(tasksDueThisWeek < 1){
+        thisWeekTaskCounter.textContent = '';
+        thisWeekTaskCounter.classList.remove('task-count');
+    }
 }
 
 function updateAnytimeTab(){
@@ -89,13 +104,26 @@ function updateAnytimeTab(){
     if(allTasks.length < 1){
         anytimeTaskCounter.classList.remove('task-count');
         anytimeTaskCounter.textContent = '';
-
     }else{
         anytimeTaskCounter.textContent = allTasks.length;
     }    
 }
 
+function toggleProjectInputDisplay(){
+    const projectInput = document.querySelector('.project-input');
+    projectInput.classList.toggle('slide-down');
+}
+
+function addProject(event){
+    const projectsList = document.querySelector('.projects-list');
+
+    if(event.key === 'Enter'){
+        createSideBarTextDiv(projectsList, event.target.value, 'project');
+        event.target.value = '';
+    }
+}
+
 PubSub.subscribe(GENERAL_LAYOUT, addSideBarEventListeners);
 PubSub.subscribe(SIDEBAR_DISPLAY, revealSideBar);
+PubSub.subscribe(TASK_COUNT, updateTodayAndThisWeekTab);
 PubSub.subscribe(TASK_COUNT, updateAnytimeTab);
-PubSub.subscribe(TASK_COUNT, updateTodayTab);
