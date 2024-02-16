@@ -2,6 +2,7 @@ import PubSub from 'pubsub-js';
 import { format } from 'date-fns';
 
 export const TASK_ADDER_EVENT_LISTENER = 'add event listeners to buttons in task adder container';
+export const TASK_EVENT_LISTENER = 'add event listeners to buttons in each task';
 
 import { GENERAL_LAYOUT, EVENT_LISTENERS, TASK_COUNT, taskAdder, content, task } from '../barrel.js';
 
@@ -164,7 +165,7 @@ function removeTaskFromPage(event){
     const currentTaskContainer = event.target.closest('.task-container');
 
     removeTask(currentTaskContainer);
-    
+
     PubSub.publish(TASK_COUNT);
 }
 
@@ -208,7 +209,7 @@ function completeTask(event){
     event.target.classList.toggle('checked');
 }
 
-export function createTaskEventListeners(){
+function createTaskEventListeners(){
     const upDownIcon = document.querySelectorAll('.up-down-icon');
     const garbageIcon = document.querySelectorAll('.garbage-icon');
     const deleteBtn = document.querySelectorAll('.delete-btn');
@@ -284,4 +285,5 @@ PubSub.subscribe(GENERAL_LAYOUT, content.createAddTaskBtn);
 PubSub.subscribe(GENERAL_LAYOUT, taskAdder.createTaskAdder);
 PubSub.subscribe(EVENT_LISTENERS, createAddTaskBtnEventListener);
 PubSub.subscribe(TASK_ADDER_EVENT_LISTENER, loadTaskAdderEventListeners);
+PubSub.subscribe(TASK_EVENT_LISTENER, createTaskEventListeners);
 
