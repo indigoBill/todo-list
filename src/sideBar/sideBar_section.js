@@ -3,19 +3,18 @@ import { GENERAL_LAYOUT } from '../barrel.js';
 import './sideBar.css';
 
 
-function createFilterOption(parentElement, filterType, className){
+function createFilterOption(parentElement, filterType, ...classNames){
     const filterOption = document.createElement('div');
     const filterOptionText = document.createElement('div');
     const taskCount = document.createElement('div');
 
     filterOption.classList.add('filter-option');
-    filterOption.classList.add(filterType.toLowerCase());
 
     filterOptionText.textContent = filterType;
 
-    if(className){
-        filterOption.classList.add(className);
-    }
+    classNames.forEach((className) => {
+        filterOption.classList.add(className.toLowerCase());
+    });
 
     filterOption.appendChild(filterOptionText);
     filterOption.appendChild(taskCount);
@@ -23,7 +22,7 @@ function createFilterOption(parentElement, filterType, className){
     parentElement.appendChild(filterOption);
 }
 
-function createSideBarTextDiv(parentElement, text, className){
+export function createSideBarTextDiv(parentElement, text, className){
     const div = document.createElement('div');
     
     if(text) div.textContent = text;
@@ -37,10 +36,10 @@ function createSideBarFilterOptions(){
     const sideBarFilterOptions = document.createElement('div');
     sideBarFilterOptions.classList.add('side-bar-filter-options');
 
-    createFilterOption(sideBarFilterOptions, 'INBOX', 'current-tab');
-    createFilterOption(sideBarFilterOptions, 'TODAY');
-    createFilterOption(sideBarFilterOptions, 'UPCOMING');
-    createFilterOption(sideBarFilterOptions, 'ANYTIME');
+    createFilterOption(sideBarFilterOptions, 'INBOX', 'inbox', 'current-tab');
+    createFilterOption(sideBarFilterOptions, 'TODAY', 'today');
+    createFilterOption(sideBarFilterOptions, 'THIS WEEK', 'this-week');
+    createFilterOption(sideBarFilterOptions, 'ANYTIME', 'anytime');
 
     return sideBarFilterOptions;
 }
@@ -56,25 +55,30 @@ function createProjects(){
 
     projectsContainer.appendChild(projectsList);
 
-    createSideBarTextDiv(projectsList, 'FILLER 1', 'project');
-    createSideBarTextDiv(projectsList, 'FILLER 2', 'project');
-    createSideBarTextDiv(projectsList, 'FILLER 3', 'project');
-
     return projectsContainer;
 }
 
-function createAddProjectBtn(){
+function createAddProjectSection(){
+    const addProjectContainer = document.createElement('div');
     const btnContainer = document.createElement('div');
     const addProjectBtn = document.createElement('button');
+    const projectInputContainer = document.createElement('div');
+    const projectInput = document.createElement('input');
 
+    addProjectContainer.classList.add('add-project-container');
     btnContainer.classList.add('project-btn-container');
     addProjectBtn.classList.add('add-project-btn');
+    projectInputContainer.classList.add('project-input-container');
+    projectInput.classList.add('project-input');
 
     addProjectBtn.textContent = '+ ADD PROJECT';
     
+    addProjectContainer.appendChild(btnContainer);
+    addProjectContainer.appendChild(projectInputContainer);
     btnContainer.appendChild(addProjectBtn);
+    projectInputContainer.appendChild(projectInput);
 
-    return btnContainer;
+    return addProjectContainer;
 }
 
 function createSideBarDivider(){
@@ -100,7 +104,7 @@ function createSideBarSection(){
     sideBarContentContainer.appendChild(createSideBarDivider());
     sideBarContentContainer.appendChild(createProjects());
     sideBarContentContainer.appendChild(createSideBarDivider());
-    sideBarContentContainer.appendChild(createAddProjectBtn());
+    sideBarContentContainer.appendChild(createAddProjectSection());
 
 }
 
