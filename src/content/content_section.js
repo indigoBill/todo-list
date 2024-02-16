@@ -1,5 +1,5 @@
 import PubSub from 'pubsub-js';
-import { TASK_ADDER_EVENT_LISTENER, getTaskAdderInput, createTaskEventListeners } from '../barrel.js';
+import { TASK_ADDER_EVENT_LISTENER, getTaskAdderInput, TASK_EVENT_LISTENER } from '../barrel.js';
 import { format, parseISO } from 'date-fns';
 import './content.css';
 
@@ -138,6 +138,32 @@ export const taskAdder = (function(){
         return selectContainer;
     }
 
+    function createProjectDropDown(){
+        const selectContainer = document.createElement('div');
+        const select = document.createElement('select');
+        const selectHeader = document.createElement('option');
+
+        selectHeader.textContent = 'SELECT PROJECT';
+
+        selectContainer.classList.add('project-container');
+        
+        selectContainer.appendChild(select);
+        select.appendChild(selectHeader);
+
+        return selectContainer;
+    }
+
+    function createDropDownContainer(){
+        const dropDownContainer = document.createElement('div');
+
+        dropDownContainer.classList.add('drop-down-container');
+
+        dropDownContainer.appendChild(createPriorityDropDown());
+        dropDownContainer.appendChild(createProjectDropDown());
+        
+        return dropDownContainer;
+    }
+
     function createTaskBtns(){
         const btnContainer = document.createElement('div');
         const addBtn = document.createElement('button');
@@ -167,7 +193,7 @@ export const taskAdder = (function(){
         taskContainer.appendChild(createTitleInput());
         taskContainer.appendChild(createDueDateCalendar());
         taskContainer.appendChild(createDescriptionInput());
-        taskContainer.appendChild(createPriorityDropDown());
+        taskContainer.appendChild(createDropDownContainer());
         taskContainer.appendChild(createTaskBtns());
         content.appendChild(taskContainer);
 
@@ -344,7 +370,8 @@ export const task = function(){
         taskContainer.appendChild(createDeleteBtn());
 
         content.appendChild(taskContainer);
-        createTaskEventListeners();
+
+        PubSub.publish(TASK_EVENT_LISTENER);
 
         return taskContainer;
     }
