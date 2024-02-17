@@ -128,6 +128,7 @@ export const taskAdder = (function(){
         highPriority.textContent = 'HIGH';
 
         selectContainer.classList.add('priority-container');
+        select.setAttribute('id', 'priority-selections');
         
         selectContainer.appendChild(select);
         select.appendChild(selectHeader);
@@ -146,6 +147,7 @@ export const taskAdder = (function(){
         selectHeader.textContent = 'SELECT PROJECT';
 
         selectContainer.classList.add('project-container');
+        select.setAttribute('id', 'project-selections')
         
         selectContainer.appendChild(select);
         select.appendChild(selectHeader);
@@ -273,6 +275,22 @@ export const task = function(){
         }
     }
 
+    function createTaskProject(){
+        const projectNode = getTaskAdderInput('project');
+        const projectContainer = document.createElement('div');
+        const project = document.createElement('p');
+
+        if(projectNode.value !== 'SELECT PROJECT'){
+            projectContainer.classList.add('task-project');
+            projectContainer.classList.add('hide');
+
+            project.textContent = projectNode.value;
+            projectContainer.appendChild(project);
+
+            return projectContainer;
+        }
+    }
+
     function createCheckBtn(){
         const checkBtn = document.createElement('button');
 
@@ -362,6 +380,10 @@ export const task = function(){
             const priorityContainer = createTaskPriority();
             userInputContainer.appendChild(priorityContainer);
             createPriorityColor(taskContainer, priorityContainer);
+        }
+
+        if(createTaskProject()){
+            userInputContainer.appendChild(createTaskProject());
         }
 
         taskContainer.appendChild(checkBtnContainer);
