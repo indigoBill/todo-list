@@ -1,5 +1,5 @@
 import PubSub from "pubsub-js";
-import { GENERAL_LAYOUT, SIDEBAR_DISPLAY, createSideBarTextDiv } from '../barrel.js';
+import { GENERAL_LAYOUT, SIDEBAR_DISPLAY, PROJECT_DROPDOWN, createSideBarTextDiv } from '../barrel.js';
 import { isToday, isThisWeek } from 'date-fns';
 
 export const TASK_COUNT = 'update the task counters in the sidebar';
@@ -120,6 +120,8 @@ function addProject(event){
     if(event.key === 'Enter'){
         createSideBarTextDiv(projectsList, event.target.value, 'project');
         event.target.value = '';
+
+        PubSub.publish(PROJECT_DROPDOWN);
     }
 }
 

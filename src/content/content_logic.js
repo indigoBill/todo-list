@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 
 export const TASK_ADDER_EVENT_LISTENER = 'add event listeners to buttons in task adder container';
 export const TASK_EVENT_LISTENER = 'add event listeners to buttons in each task';
+export const PROJECT_DROPDOWN = 'update project dropdown list options as user adds projects';
 
 import { GENERAL_LAYOUT, EVENT_LISTENERS, TASK_COUNT, taskAdder, content, task } from '../barrel.js';
 
@@ -27,7 +28,10 @@ export function getTaskAdderInput(inputName){
             input = document.querySelector('#description');
             break;
         case 'priority' :
-            input = document.querySelector('select');
+            input = document.querySelector('#priority-selections');
+            break;
+        case 'project' :
+            input = document.querySelector('#project-selections');
             break;
     }
 
@@ -39,8 +43,9 @@ function clearTaskAdder(){
     const date = getTaskAdderInput('date');
     const description = getTaskAdderInput('description');
     const priority = getTaskAdderInput('priority');
+    const project = getTaskAdderInput('project');
 
-    const inputs = [title, date, description, priority];
+    const inputs = [title, date, description, priority, project];
 
     inputs.forEach((input) => {
         if(input.type.includes('select')){
@@ -84,6 +89,14 @@ function removeEdittedTask(){
     removeTask(currentTaskContainer);
 }
 
+function removeTaskFromPage(event){
+    const currentTaskContainer = event.target.closest('.task-container');
+
+    removeTask(currentTaskContainer);
+
+    PubSub.publish(TASK_COUNT);
+}
+
 function addEditClass(taskObj){
     const allTaskContainers = document.querySelectorAll('.task-container');
 
@@ -109,7 +122,10 @@ function editTask(event){
             getTaskAdderInput('description').value = input.textContent;
         }else if(input.className === 'task-priority'){
             getTaskAdderInput('priority').value = input.textContent;
+        }else if(input.className === 'task-project'){
+            getTaskAdderInput('project').value = input.textContent;
         }
+        
     }
 
     currentlyEditting = true;
@@ -161,12 +177,17 @@ function addTaskToPage(requiredInputs){
     }
 }
 
-function removeTaskFromPage(event){
-    const currentTaskContainer = event.target.closest('.task-container');
+function addProjectOptionToDropDown(){
+    const projectDropDown = getTaskAdderInput('project');
+    const projects = document.querySelectorAll('.project');
 
-    removeTask(currentTaskContainer);
+    //FIX BUG: PROJECTS ARE ADDED MULTIPLE TIMES TO DROPDOWN
+    projects.forEach((project) => {
+        const projectOption = document.createElement('option');
 
-    PubSub.publish(TASK_COUNT);
+        projectOption.textContent = project.textContent.toUpperCase();
+        projectDropDown.appendChild(projectOption);
+    });
 }
 
 function extendTaskObjDisplay(event){
@@ -178,6 +199,7 @@ function extendTaskObjDisplay(event){
 
             const descriptionNode = document.querySelector('.active-task .task-description');
             const priorityNode = document.querySelector('.active-task .task-priority');
+            const projectNode = document.querySelector('.active-task .task-project');
             const editIcon = document.querySelector('.active-task .edit-icon');
 
             if(container.contains(descriptionNode)){
@@ -186,6 +208,10 @@ function extendTaskObjDisplay(event){
             
             if(container.contains(priorityNode)){
                 priorityNode.classList.toggle('hide');
+            }
+
+            if(container.contains(projectNode)){
+                projectNode.classList.toggle('hide');
             }
 
             editIcon.classList.toggle('hide');
@@ -286,4 +312,5 @@ PubSub.subscribe(GENERAL_LAYOUT, taskAdder.createTaskAdder);
 PubSub.subscribe(EVENT_LISTENERS, createAddTaskBtnEventListener);
 PubSub.subscribe(TASK_ADDER_EVENT_LISTENER, loadTaskAdderEventListeners);
 PubSub.subscribe(TASK_EVENT_LISTENER, createTaskEventListeners);
+PubSub.subscribe(PROJECT_DROPDOWN, addProjectOptionToDropDown);
 
