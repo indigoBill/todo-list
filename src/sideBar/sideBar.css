@@ -121,6 +121,25 @@
 
 .project {
     padding: 10px;
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 10px;
+}
+
+.project-text {
+    flex-grow: 1;
+}
+
+.project-delete-btn {
+    background: none;
+    border: none;
+    font-weight: bold;
+    font-size: 16px;
+    color: var(--dark-main-color);
+}
+
+.project-delete-btn:hover {
+    color: var(--main-color);
 }
 
 .add-project-container {
@@ -143,7 +162,7 @@
 }
 
 .project-input-container {
-    min-height: 50px;
+    min-height: 32px;
     position: relative;
     overflow: hidden;
 }
@@ -160,6 +179,12 @@
 
 .slide-down {
     top: 0;
+}
+
+.error-container {
+    text-align: center;
+    color: #f35454;
+    font-size: 14px;
 }
 
 .current-tab {
