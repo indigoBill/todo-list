@@ -384,6 +384,7 @@ export const task = function(){
 
         if(createTaskProject()){
             userInputContainer.appendChild(createTaskProject());
+            taskContainer.setAttribute('project', getTaskAdderInput('project').value);
         }
 
         taskContainer.appendChild(checkBtnContainer);
