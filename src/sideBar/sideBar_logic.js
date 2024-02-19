@@ -1,8 +1,10 @@
 import PubSub from "pubsub-js";
-import { GENERAL_LAYOUT, SIDEBAR_DISPLAY, PROJECT_DROPDOWN, createSideBarTextDiv } from '../barrel.js';
+import { GENERAL_LAYOUT, SIDEBAR_DISPLAY, PROJECT_DROPDOWN, PROJECT_ATTRIBUTE, createProjectDiv } from '../barrel.js';
 import { isToday, isThisWeek } from 'date-fns';
 
 export const TASK_COUNT = 'update the task counters in the sidebar';
+
+const projectNamesArr = [];
 
 function revealSideBar(){
     const sideBar = document.querySelector('.side-bar');
@@ -34,7 +36,6 @@ function addSideBarEventListeners(){
     const addProjectBtn = document.querySelector('.add-project-btn');
     const projectInput = document.querySelector('.project-input');
 
-
     sideBarElements.forEach((element) => {
         element.addEventListener('click', (event) => {
             removeCurrentTab();
@@ -53,11 +54,19 @@ function getAllTasks(){
     return allTasks;
 }
 
-//WHEN A TASK IS CREATED UNDER A PROJECT IT SHOULD HAVE AN ATTRIBUTE CALLED PROJECT
-//WITH ITS VALUE EQUALLING TO THE PROJECT NAME
 function updateInboxTab(){
     //IF TASK DOESNT HAVE A PROJECT ATTRIBUTE ITLL COUNT TO THE INBOX TAB
+    const inboxTaskCounter = document.querySelector('.inbox > div:last-child');
+    const tasksWithoutProject = document.querySelectorAll('.content > div:nth-child(n + 3):not(.task-container[project])');
 
+    inboxTaskCounter.classList.add('task-count');
+
+    if(tasksWithoutProject.length < 1){
+        inboxTaskCounter.classList.remove('task-count');
+        inboxTaskCounter.textContent = '';
+    }else{
+        inboxTaskCounter.textContent = tasksWithoutProject.length;
+    }  
 }
 
 function updateTodayAndThisWeekTab(){
@@ -114,18 +123,50 @@ function toggleProjectInputDisplay(){
     projectInput.classList.toggle('slide-down');
 }
 
+function addProjectEventListeners(){
+    const deleteProjectBtns = document.querySelectorAll('.project-delete-btn');
+
+    deleteProjectBtns.forEach((deleteBtn) => {
+        deleteBtn.addEventListener('click', deleteProject);
+    });
+}
+
 function addProject(event){
     const projectsList = document.querySelector('.projects-list');
 
     if(event.key === 'Enter'){
-        createSideBarTextDiv(projectsList, event.target.value, 'project');
-        event.target.value = '';
+        const errMessageContainer = document.querySelector('.error-container');
+        let newProjectName = event.target.value;
 
-        PubSub.publish(PROJECT_DROPDOWN);
+        if(!(projectNamesArr.includes(newProjectName))){
+            createProjectDiv(projectsList, newProjectName);
+            projectNamesArr.push(newProjectName);
+
+            event.target.value = '';
+            errMessageContainer.classList.add('hide');
+
+            addProjectEventListeners();
+            PubSub.publish(PROJECT_DROPDOWN);
+        }else{
+            errMessageContainer.classList.remove('hide');
+        }
     }
 }
 
+function deleteProject(event){
+    const deletedProjectText = event.target.previousSibling.textContent;
+    const deletedProjectIndex = projectNamesArr.indexOf(deletedProjectText);
+
+    projectNamesArr.splice(deletedProjectIndex, 1);
+    event.target.closest('.project').remove();
+
+    PubSub.publish(PROJECT_DROPDOWN);
+    PubSub.publish(PROJECT_ATTRIBUTE);
+}
+
+
 PubSub.subscribe(GENERAL_LAYOUT, addSideBarEventListeners);
 PubSub.subscribe(SIDEBAR_DISPLAY, revealSideBar);
+PubSub.subscribe(TASK_COUNT, updateInboxTab);
 PubSub.subscribe(TASK_COUNT, updateTodayAndThisWeekTab);
 PubSub.subscribe(TASK_COUNT, updateAnytimeTab);
