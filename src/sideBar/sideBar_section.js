@@ -22,7 +22,7 @@ function createFilterOption(parentElement, filterType, ...classNames){
     parentElement.appendChild(filterOption);
 }
 
-export function createSideBarTextDiv(parentElement, text, className){
+function createSideBarTextDiv(parentElement, text, className){
     const div = document.createElement('div');
     
     if(text) div.textContent = text;
@@ -58,25 +58,51 @@ function createProjects(){
     return projectsContainer;
 }
 
+export function createProjectDiv(parentElement, text){
+    const project = document.createElement('div');
+    const projectText = document.createElement('div');
+    const deleteProjectBtn = document.createElement('button');
+
+    project.classList.add('project');
+    projectText.classList.add('project-text');
+    deleteProjectBtn.classList.add('project-delete-btn');
+    
+    if(text) projectText.textContent = text;
+    deleteProjectBtn.textContent = 'x';
+
+    project.appendChild(projectText);
+    project.appendChild(deleteProjectBtn);
+
+    parentElement.appendChild(project);
+}
+
 function createAddProjectSection(){
     const addProjectContainer = document.createElement('div');
     const btnContainer = document.createElement('div');
     const addProjectBtn = document.createElement('button');
     const projectInputContainer = document.createElement('div');
     const projectInput = document.createElement('input');
+    const errorContainer = document.createElement('div');
+    const errorMessage = document.createElement('p');
 
     addProjectContainer.classList.add('add-project-container');
     btnContainer.classList.add('project-btn-container');
     addProjectBtn.classList.add('add-project-btn');
     projectInputContainer.classList.add('project-input-container');
     projectInput.classList.add('project-input');
+    errorContainer.classList.add('error-container');
+    errorContainer.classList.add('hide');
+    errorMessage.classList.add('error-message');
 
     addProjectBtn.textContent = '+ ADD PROJECT';
+    errorMessage.textContent = 'DUPLICATE NAMES NOT ALLOWED';
     
     addProjectContainer.appendChild(btnContainer);
     addProjectContainer.appendChild(projectInputContainer);
+    addProjectContainer.appendChild(errorContainer);
     btnContainer.appendChild(addProjectBtn);
     projectInputContainer.appendChild(projectInput);
+    errorContainer.appendChild(errorMessage);
 
     return addProjectContainer;
 }
