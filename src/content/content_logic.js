@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 export const TASK_ADDER_EVENT_LISTENER = 'add event listeners to buttons in task adder container';
 export const TASK_EVENT_LISTENER = 'add event listeners to buttons in each task';
 export const PROJECT_DROPDOWN = 'update project dropdown list options as user adds projects';
+export const PROJECT_ATTRIBUTE = 'remove specific project attribute from tasks if specific project is deleted';
 
 import { GENERAL_LAYOUT, EVENT_LISTENERS, TASK_COUNT, taskAdder, content, task } from '../barrel.js';
 
@@ -179,15 +180,29 @@ function addTaskToPage(requiredInputs){
 
 function addProjectOptionToDropDown(){
     const projectDropDown = getTaskAdderInput('project');
-    const projects = document.querySelectorAll('.project');
+    const projects = document.querySelectorAll('.project-text');
 
-    //FIX BUG: PROJECTS ARE ADDED MULTIPLE TIMES TO DROPDOWN
+    while(projectDropDown.childNodes.length > 1){
+        projectDropDown.removeChild(projectDropDown.lastChild);
+    }
+
     projects.forEach((project) => {
+        const projectName = project.textContent;
         const projectOption = document.createElement('option');
 
-        projectOption.textContent = project.textContent.toUpperCase();
+        projectOption.textContent = projectName;
         projectDropDown.appendChild(projectOption);
-    });
+    });  
+}
+
+function removeProjectAttribute(){
+    const tasks = document.querySelectorAll('[project]');
+    const projectList = document.querySelectorAll('.project-text');
+
+    const projectListArr = Array.from(projectList);
+
+    
+    console.log(tasks);
 }
 
 function extendTaskObjDisplay(event){
@@ -313,4 +328,5 @@ PubSub.subscribe(EVENT_LISTENERS, createAddTaskBtnEventListener);
 PubSub.subscribe(TASK_ADDER_EVENT_LISTENER, loadTaskAdderEventListeners);
 PubSub.subscribe(TASK_EVENT_LISTENER, createTaskEventListeners);
 PubSub.subscribe(PROJECT_DROPDOWN, addProjectOptionToDropDown);
+PubSub.subscribe(PROJECT_ATTRIBUTE, removeProjectAttribute);
 
