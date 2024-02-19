@@ -136,6 +136,10 @@ select:focus {
     overflow: hidden;
 }
 
+.task-project p::before {
+    content: 'PROJECT: ';
+}
+
 .completed {
     text-decoration: line-through;
     text-decoration-thickness: 2px;
