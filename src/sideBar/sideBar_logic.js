@@ -1,8 +1,9 @@
 import PubSub from "pubsub-js";
-import { GENERAL_LAYOUT, SIDEBAR_DISPLAY, PROJECT_DROPDOWN, PROJECT_ATTRIBUTE, createProjectDiv } from '../barrel.js';
+import { GENERAL_LAYOUT, SIDEBAR_DISPLAY, PROJECT_DROPDOWN, PROJECT_ATTRIBUTE, CURRENT_TAB, createProjectDiv } from '../barrel.js';
 import { isToday, isThisWeek } from 'date-fns';
 
 export const TASK_COUNT = 'update the task counters in the sidebar';
+export const DEFAULT_CURRENT_TAB = 'set the inbox tab to be the default current tab';
 
 const projectNamesArr = [];
 
@@ -31,15 +32,25 @@ function selectCurrentTab(event){
     event.currentTarget.classList.toggle('current-tab');
 }
 
+function setDefaultCurrentTab(){
+    const defaultTab = document.querySelector('.inbox');
+
+    defaultTab.classList.add('current-tab');
+
+    PubSub.publish(CURRENT_TAB);
+}
+
 function addSideBarEventListeners(){
-    const sideBarElements = document.querySelectorAll('.filter-option, .project');
+    const filterOptions = document.querySelectorAll('.filter-option');
     const addProjectBtn = document.querySelector('.add-project-btn');
     const projectInput = document.querySelector('.project-input');
 
-    sideBarElements.forEach((element) => {
+    filterOptions.forEach((element) => {
         element.addEventListener('click', (event) => {
             removeCurrentTab();
             selectCurrentTab(event);
+
+            PubSub.publish(CURRENT_TAB);
         });
     });
 
@@ -124,10 +135,23 @@ function toggleProjectInputDisplay(){
 }
 
 function addProjectEventListeners(){
+    const projectElements = document.querySelectorAll('.project');
     const deleteProjectBtns = document.querySelectorAll('.project-delete-btn');
 
+    projectElements.forEach((element) => {
+        element.addEventListener('click', (event) => {
+            removeCurrentTab();
+            selectCurrentTab(event);
+
+            PubSub.publish(CURRENT_TAB);
+        });
+    });
+
     deleteProjectBtns.forEach((deleteBtn) => {
-        deleteBtn.addEventListener('click', deleteProject);
+        deleteBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            deleteProject(event);
+        });
     });
 }
 
@@ -162,6 +186,7 @@ function deleteProject(event){
 
     PubSub.publish(PROJECT_DROPDOWN);
     PubSub.publish(PROJECT_ATTRIBUTE);
+    PubSub.publish(CURRENT_TAB);
 }
 
 
@@ -170,3 +195,4 @@ PubSub.subscribe(SIDEBAR_DISPLAY, revealSideBar);
 PubSub.subscribe(TASK_COUNT, updateInboxTab);
 PubSub.subscribe(TASK_COUNT, updateTodayAndThisWeekTab);
 PubSub.subscribe(TASK_COUNT, updateAnytimeTab);
+PubSub.subscribe(DEFAULT_CURRENT_TAB, setDefaultCurrentTab);
