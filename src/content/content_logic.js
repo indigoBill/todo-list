@@ -1,12 +1,13 @@
 import PubSub from 'pubsub-js';
-import { format } from 'date-fns';
+import { format, isToday, isThisWeek } from 'date-fns';
 
 export const TASK_ADDER_EVENT_LISTENER = 'add event listeners to buttons in task adder container';
 export const TASK_EVENT_LISTENER = 'add event listeners to buttons in each task';
 export const PROJECT_DROPDOWN = 'update project dropdown list options as user adds projects';
 export const PROJECT_ATTRIBUTE = 'remove specific project attribute from tasks if specific project is deleted';
+export const CURRENT_TAB = 'display tasks of currently selected sidebar tab';
 
-import { GENERAL_LAYOUT, EVENT_LISTENERS, TASK_COUNT, taskAdder, content, task } from '../barrel.js';
+import { GENERAL_LAYOUT, EVENT_LISTENERS, TASK_COUNT, DEFAULT_CURRENT_TAB, taskAdder, content, task } from '../barrel.js';
 
 const taskArr = [];
 let currentlyEditting = false;
@@ -175,6 +176,7 @@ function addTaskToPage(requiredInputs){
         resetPage();
 
         PubSub.publish(TASK_COUNT);
+        PubSub.publish(CURRENT_TAB);
     }
 }
 
@@ -196,13 +198,26 @@ function addProjectOptionToDropDown(){
 }
 
 function removeProjectAttribute(){
-    const tasks = document.querySelectorAll('[project]');
+    const tasksWithProjectAtt = document.querySelectorAll('[project]');
     const projectList = document.querySelectorAll('.project-text');
+    const projectListArr = [];
 
-    const projectListArr = Array.from(projectList);
+    projectList.forEach((project) => {
+        projectListArr.push(project.textContent);
+    });
 
-    
-    console.log(tasks);
+    tasksWithProjectAtt.forEach((task) => {
+        const attributeValue = task.getAttribute('project');
+
+        if(!(projectListArr.includes(attributeValue))){
+            const userInputContainer = task.querySelector('.user-input-container');
+
+            task.removeAttribute('project');
+            userInputContainer.removeChild(userInputContainer.querySelector('.task-project'));
+
+            PubSub.publish(TASK_COUNT);
+        }
+    });
 }
 
 function extendTaskObjDisplay(event){
@@ -317,9 +332,93 @@ function createAddTaskBtnEventListener(){
     });
 }
 
+function displayInboxTasks(){    
+    const allTasks = document.querySelectorAll('.task-container');
+
+    allTasks.forEach((task) => {
+        if(task.getAttribute('project') !== null){
+            task.classList.add('hide');
+        }else{
+            task.classList.remove('hide');
+        }
+    });
+}
+
+function displayTodayTasks(){    
+    const allTasks = document.querySelectorAll('.task-container');
+
+    allTasks.forEach((task) => {
+        const taskDate = task.querySelector('.task-date');
+
+        if(isToday(taskDate.textContent)){
+            task.classList.remove('hide');
+        }else{
+            task.classList.add('hide');
+        }
+    });
+}
+
+function displayThisWeekTasks(){    
+    const allTasks = document.querySelectorAll('.task-container');
+
+    allTasks.forEach((task) => {
+        const taskDate = task.querySelector('.task-date');
+
+        if(isThisWeek(taskDate.textContent)){
+            task.classList.remove('hide');
+        }else{
+            task.classList.add('hide');
+        }
+    });
+}
+
+function displayAnytimeTasks(){    
+    const allTasks = document.querySelectorAll('.task-container');
+
+    allTasks.forEach((task) => {
+        task.classList.remove('hide');
+    });
+}
+
+function displayProjectTasks(projectTitle){
+    const allTasks = document.querySelectorAll('.task-container');
+
+    allTasks.forEach((task) => {
+        const taskBelongsToProject = task.getAttribute('project') === projectTitle;
+
+        if(taskBelongsToProject){
+            task.classList.remove('hide');
+        }else{
+            task.classList.add('hide');
+        }
+    });
+}
+
 function showCurrentTabContent(){
+    //DEFAULT BACK TO INBOX IF CURRENT TAB IS A PROJECT THAT WAS REMOVED
+    const currentTab = document.querySelector('.current-tab');
 
+    if(currentTab === null){
+        PubSub.publish(DEFAULT_CURRENT_TAB);
+        return;
+    }
 
+    if(currentTab.classList.contains('filter-option')){
+        if(currentTab.classList.contains('inbox')){
+            displayInboxTasks();
+        }else if(currentTab.classList.contains('today')){
+            displayTodayTasks();
+        }else if(currentTab.classList.contains('this-week')){
+            displayThisWeekTasks();
+        }else if(currentTab.classList.contains('anytime')){
+            displayAnytimeTasks();
+        }
+    }else{
+        const projectName = currentTab.querySelector('.project-text').textContent;
+
+        displayProjectTasks(projectName);
+    }
+    
 }
 
 PubSub.subscribe(GENERAL_LAYOUT, content.createAddTaskBtn);
@@ -329,4 +428,5 @@ PubSub.subscribe(TASK_ADDER_EVENT_LISTENER, loadTaskAdderEventListeners);
 PubSub.subscribe(TASK_EVENT_LISTENER, createTaskEventListeners);
 PubSub.subscribe(PROJECT_DROPDOWN, addProjectOptionToDropDown);
 PubSub.subscribe(PROJECT_ATTRIBUTE, removeProjectAttribute);
+PubSub.subscribe(CURRENT_TAB, showCurrentTabContent);
 
