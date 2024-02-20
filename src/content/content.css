@@ -137,7 +137,8 @@ select:focus {
 }
 
 .task-project p::before {
-    content: 'PROJECT: ';
+    content: 'PROJECT : ';
+    font-weight: bold;
 }
 
 .completed {
