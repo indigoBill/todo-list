@@ -395,7 +395,6 @@ function displayProjectTasks(projectTitle){
 }
 
 function showCurrentTabContent(){
-    //DEFAULT BACK TO INBOX IF CURRENT TAB IS A PROJECT THAT WAS REMOVED
     const currentTab = document.querySelector('.current-tab');
 
     if(currentTab === null){
