@@ -6,6 +6,7 @@ export const TASK_EVENT_LISTENER = 'add event listeners to buttons in each task'
 export const PROJECT_DROPDOWN = 'update project dropdown list options as user adds projects';
 export const PROJECT_ATTRIBUTE = 'remove specific project attribute from tasks if specific project is deleted';
 export const CURRENT_TAB = 'display tasks of currently selected sidebar tab';
+export const SEARCH_TASKS = 'filter tasks using the search bar';
 
 import { GENERAL_LAYOUT, EVENT_LISTENERS, TASK_COUNT, DEFAULT_CURRENT_TAB, taskAdder, content, task } from '../barrel.js';
 
@@ -417,7 +418,25 @@ function showCurrentTabContent(){
 
         displayProjectTasks(projectName);
     }
-    
+}
+
+function searchForTasks(){
+    const currentPageTasksTitleContainers = document.querySelectorAll('.task-container:not(.hide) .task-title');
+    let searchValue = document.querySelector('#search').value.toLowerCase();
+
+    currentPageTasksTitleContainers.forEach((titleContainer) => {
+        const taskTitle = titleContainer.textContent.toLowerCase();
+
+        if(taskTitle.includes(searchValue)){
+            titleContainer.closest('.task-container').classList.remove('search-hide');
+        }else{
+            titleContainer.closest('.task-container').classList.add('search-hide');
+        }
+
+        if(searchValue === ''){
+            titleContainer.closest('.task-container').classList.remove('search-hide');
+        }
+    });
 }
 
 PubSub.subscribe(GENERAL_LAYOUT, content.createAddTaskBtn);
@@ -428,4 +447,5 @@ PubSub.subscribe(TASK_EVENT_LISTENER, createTaskEventListeners);
 PubSub.subscribe(PROJECT_DROPDOWN, addProjectOptionToDropDown);
 PubSub.subscribe(PROJECT_ATTRIBUTE, removeProjectAttribute);
 PubSub.subscribe(CURRENT_TAB, showCurrentTabContent);
+PubSub.subscribe(SEARCH_TASKS, searchForTasks);
 
