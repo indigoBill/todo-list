@@ -35,6 +35,7 @@ function selectCurrentTab(event){
 function setDefaultCurrentTab(){
     const defaultTab = document.querySelector('.inbox');
 
+    removeCurrentTab();
     defaultTab.classList.add('current-tab');
 
     PubSub.publish(CURRENT_TAB);
@@ -66,7 +67,6 @@ function getAllTasks(){
 }
 
 function updateInboxTab(){
-    //IF TASK DOESNT HAVE A PROJECT ATTRIBUTE ITLL COUNT TO THE INBOX TAB
     const inboxTaskCounter = document.querySelector('.inbox > div:last-child');
     const tasksWithoutProject = document.querySelectorAll('.content > div:nth-child(n + 3):not(.task-container[project])');
 
@@ -158,7 +158,7 @@ function addProjectEventListeners(){
 function addProject(event){
     const projectsList = document.querySelector('.projects-list');
 
-    if(event.key === 'Enter'){
+    if(event.key === 'Enter' && event.target.value !== ''){
         const errMessageContainer = document.querySelector('.error-container');
         let newProjectName = event.target.value;
 
