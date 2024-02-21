@@ -221,6 +221,10 @@ path {
     display: none;
 }
 
+.search-hide {
+    display: none;
+}
+
 @media screen and (max-width: 420px) {
     .required-container {
         display: none;
