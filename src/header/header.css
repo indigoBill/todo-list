@@ -75,10 +75,6 @@ input:focus {
     background: url('./assets/home-variant.svg');
 }
 
-.plus-btn {
-    background: url('./assets/plus.svg');
-}
-
 .search-btn {
     background: url('./assets/magnify.svg');
 }
@@ -107,10 +103,6 @@ input:focus {
 
 .header-bottom-section > div:first-child {
     padding-right: 20px;
-}
-
-.header-bottom-section > div:last-child {
-    margin-left: auto;
 }
 
 .header-bottom-section {
