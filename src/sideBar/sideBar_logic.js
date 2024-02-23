@@ -4,6 +4,7 @@ import { isToday, isThisWeek } from 'date-fns';
 
 export const TASK_COUNT = 'update the task counters in the sidebar';
 export const DEFAULT_CURRENT_TAB = 'set the inbox tab to be the default current tab';
+export const LOAD_STORAGE_PROJECTS = 'load projects from local storage';
 
 const projectNamesArr = [];
 
@@ -151,6 +152,8 @@ function addProjectEventListeners(){
         deleteBtn.addEventListener('click', (event) => {
             event.stopPropagation();
             deleteProject(event);
+
+            loadDomObjToStorage();
         });
     });
 }
@@ -171,6 +174,8 @@ function addProject(event){
 
             addProjectEventListeners();
             PubSub.publish(PROJECT_DROPDOWN);
+
+            loadDomObjToStorage();
         }else{
             errMessageContainer.classList.remove('hide');
         }
@@ -189,6 +194,36 @@ function deleteProject(event){
     PubSub.publish(CURRENT_TAB);
 }
 
+function loadDomObjToStorage(){    
+    const stringProjectArr = [];
+    const projects = document.querySelectorAll('.project');
+
+    projects.forEach((projDomObj) => {
+        const stringObj = projDomObj.outerHTML;
+
+        if(!(stringProjectArr.includes(stringObj))){
+            stringProjectArr.push(stringObj);
+        }
+    });
+
+    localStorage.setItem('allProjects', JSON.stringify(stringProjectArr));
+}
+
+function reloadProjectsFromStorage(){
+    const objProjectArr = JSON.parse(localStorage.getItem('allProjects'));
+    const parser = new DOMParser();
+
+    objProjectArr.forEach((stringObj) => {
+        const newDoc = parser.parseFromString(stringObj, 'text/html');
+        const projectName = newDoc.body.firstChild.firstChild.textContent;
+
+        projectNamesArr.push(projectName);
+        document.querySelector('.projects-list').appendChild(newDoc.body.firstChild);
+
+        addProjectEventListeners();
+        PubSub.publish(PROJECT_DROPDOWN);
+    });
+}
 
 PubSub.subscribe(GENERAL_LAYOUT, addSideBarEventListeners);
 PubSub.subscribe(SIDEBAR_DISPLAY, revealSideBar);
@@ -196,3 +231,4 @@ PubSub.subscribe(TASK_COUNT, updateInboxTab);
 PubSub.subscribe(TASK_COUNT, updateTodayAndThisWeekTab);
 PubSub.subscribe(TASK_COUNT, updateAnytimeTab);
 PubSub.subscribe(DEFAULT_CURRENT_TAB, setDefaultCurrentTab);
+PubSub.subscribe(LOAD_STORAGE_PROJECTS, reloadProjectsFromStorage);

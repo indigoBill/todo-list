@@ -7,6 +7,7 @@ export const PROJECT_DROPDOWN = 'update project dropdown list options as user ad
 export const PROJECT_ATTRIBUTE = 'remove specific project attribute from tasks if specific project is deleted';
 export const CURRENT_TAB = 'display tasks of currently selected sidebar tab';
 export const SEARCH_TASKS = 'filter tasks using the search bar';
+export const LOAD_STORAGE_TASKS = 'load tasks from local storage';
 
 import { GENERAL_LAYOUT, EVENT_LISTENERS, TASK_COUNT, DEFAULT_CURRENT_TAB, taskAdder, content, task } from '../barrel.js';
 
@@ -84,6 +85,8 @@ function removeTask(taskObj){
 
     taskObj.remove();
     updateDataIndexAttribute();
+
+    loadDomObjToStorage();
 }
 
 function removeEdittedTask(){
@@ -198,6 +201,21 @@ function addProjectOptionToDropDown(){
     });  
 }
 
+//IF A PROJECT IS DELETED & TASKS WERE ASSIGNED TO THAT PROJECT WE HAVE TO RELOAD
+//THE taskArr WITH THE NEWLY EDITTED TASKS W/O PROJECT ATTRIBUTES
+//THIS KEEPS THE taskArr CONSISTENT WITH THE TASKS IN THE VIEWPORT
+function reloadTaskArr(){
+    taskArr.splice(0, taskArr.length);
+
+    const totalTasks = document.querySelectorAll('.task-container');
+
+    totalTasks.forEach((task) => {
+        taskArr.push(task);
+    });
+
+    loadDomObjToStorage();
+}
+
 function removeProjectAttribute(){
     const tasksWithProjectAtt = document.querySelectorAll('[project]');
     const projectList = document.querySelectorAll('.project-text');
@@ -216,6 +234,7 @@ function removeProjectAttribute(){
             task.removeAttribute('project');
             userInputContainer.removeChild(userInputContainer.querySelector('.task-project'));
 
+            reloadTaskArr();
             PubSub.publish(TASK_COUNT);
         }
     });
@@ -304,6 +323,8 @@ function createAddBtnEventListener(){
             removeEdittedTask();
             currentlyEditting = false;
         }
+
+        loadDomObjToStorage();
     });
 }
 
@@ -439,6 +460,39 @@ function searchForTasks(){
     });
 }
 
+function loadDomObjToStorage(){    
+    const stringTaskArr = [];
+
+    taskArr.forEach((taskDomObj) => {
+        const stringObj = taskDomObj.outerHTML;
+
+        if(!(stringTaskArr.includes(stringObj))){
+            stringTaskArr.push(stringObj);
+        }
+        
+    });
+
+    localStorage.setItem('allTasks', JSON.stringify(stringTaskArr));
+}
+
+function reloadTasksFromStorage(){
+    const objTaskArr = JSON.parse(localStorage.getItem('allTasks'));
+    const parser = new DOMParser();
+
+    objTaskArr.forEach((stringObj) => {
+        const newDoc = parser.parseFromString(stringObj, 'text/html');
+        const domObj = newDoc.body.firstChild;
+
+        addTaskToArray(domObj);
+        document.querySelector('.content').appendChild(newDoc.body.firstChild);
+
+        createTaskEventListeners();
+        PubSub.publish(TASK_COUNT);
+        PubSub.publish(CURRENT_TAB);
+    });
+
+}
+
 PubSub.subscribe(GENERAL_LAYOUT, content.createAddTaskBtn);
 PubSub.subscribe(GENERAL_LAYOUT, taskAdder.createTaskAdder);
 PubSub.subscribe(EVENT_LISTENERS, createAddTaskBtnEventListener);
@@ -448,4 +502,6 @@ PubSub.subscribe(PROJECT_DROPDOWN, addProjectOptionToDropDown);
 PubSub.subscribe(PROJECT_ATTRIBUTE, removeProjectAttribute);
 PubSub.subscribe(CURRENT_TAB, showCurrentTabContent);
 PubSub.subscribe(SEARCH_TASKS, searchForTasks);
+PubSub.subscribe(LOAD_STORAGE_TASKS, reloadTasksFromStorage);
+
 
