@@ -73,12 +73,11 @@ function toggleEdittedTaskObjDisplay(){
 }
 
 function removeTask(taskObj){
-    let currentIndex = taskObj.getAttribute('task-index');
-
-    taskArr.forEach((obj) => {
-        let objIndex = obj.attributes[1].nodeValue;
-
-        if(objIndex === currentIndex){
+    let currentIndex = Number(taskObj.getAttribute('task-index'));
+   
+    taskArr.forEach((obj, index) => {
+    
+        if(index === currentIndex){
             taskArr.splice(currentIndex, 1);
         }
     });
@@ -91,7 +90,6 @@ function removeTask(taskObj){
 
 function removeEdittedTask(){
     const currentTaskContainer = getEdittedTaskObj();
-
     removeTask(currentTaskContainer);
 }
 
@@ -131,7 +129,6 @@ function editTask(event){
         }else if(input.className === 'task-project'){
             getTaskAdderInput('project').value = input.textContent;
         }
-        
     }
 
     currentlyEditting = true;
@@ -201,9 +198,8 @@ function addProjectOptionToDropDown(){
     });  
 }
 
-//IF A PROJECT IS DELETED & TASKS WERE ASSIGNED TO THAT PROJECT WE HAVE TO RELOAD
-//THE taskArr WITH THE NEWLY EDITTED TASKS W/O PROJECT ATTRIBUTES
-//THIS KEEPS THE taskArr CONSISTENT WITH THE TASKS IN THE VIEWPORT
+//IF A PROJECT IS DELETED & TASKS WERE ASSIGNED TO THAT PROJECT WE HAVE TO RELOAD THE taskArr WITH THE NEWLY
+// EDITTED TASKS W/O PROJECT ATTRIBUTES THIS KEEPS THE taskArr CONSISTENT WITH THE TASKS IN THE VIEWPORT
 function reloadTaskArr(){
     taskArr.splice(0, taskArr.length);
 
@@ -269,6 +265,8 @@ function extendTaskObjDisplay(event){
             container.classList.remove('active-task');
         }
     });
+
+    reloadTaskArr();
 }
 
 function toggleDeleteBtn(event){
@@ -281,8 +279,11 @@ function toggleDeleteBtn(event){
 
 function completeTask(event){
     const currentTaskContainer = event.target.closest('.task-container');
+    
     currentTaskContainer.classList.toggle('completed');
     event.target.classList.toggle('checked');
+
+    reloadTaskArr();
 }
 
 function createTaskEventListeners(){
@@ -317,12 +318,14 @@ function createAddBtnEventListener(){
     const addBtn = document.querySelector('.add-btn');
 
     addBtn.addEventListener('click', () => {
-        addTaskToPage(checkRequiredInputValues());
-
         if(currentlyEditting){
             removeEdittedTask();
             currentlyEditting = false;
         }
+
+        addTaskToPage(checkRequiredInputValues());
+
+        
 
         loadDomObjToStorage();
     });
@@ -490,7 +493,6 @@ function reloadTasksFromStorage(){
         PubSub.publish(TASK_COUNT);
         PubSub.publish(CURRENT_TAB);
     });
-
 }
 
 PubSub.subscribe(GENERAL_LAYOUT, content.createAddTaskBtn);
