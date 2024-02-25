@@ -245,5 +245,9 @@ path {
         gap: 5px;
     }
 
+    .task-container {
+        min-height: 150px;
+    }
+
 }
 
