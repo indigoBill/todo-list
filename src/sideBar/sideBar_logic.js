@@ -160,9 +160,9 @@ function addProjectEventListeners(){
 
 function addProject(event){
     const projectsList = document.querySelector('.projects-list');
+    const errMessageContainer = document.querySelector('.error-container');
 
     if(event.key === 'Enter' && event.target.value !== ''){
-        const errMessageContainer = document.querySelector('.error-container');
         let newProjectName = event.target.value;
 
         if(!(projectNamesArr.includes(newProjectName))){
@@ -179,6 +179,8 @@ function addProject(event){
         }else{
             errMessageContainer.classList.remove('hide');
         }
+    }else{
+        errMessageContainer.classList.add('hide');
     }
 }
 
